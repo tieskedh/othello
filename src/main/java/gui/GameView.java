@@ -24,8 +24,9 @@ public class GameView extends JPanel implements ActionListener{
     private LinkedList<ActionListener> actionListeners = new LinkedList<>();
     private int size;
 
+
     /**
-     * Creates the GameView for tictactoe
+     * Creates the GameView for Othello
      * @param width the number of fields in the width
      * @param height the number of fields in the height
      * @param players the representation of the players by their id
@@ -48,7 +49,7 @@ public class GameView extends JPanel implements ActionListener{
 
     /**
      * Action to perform when a button is pressed
-     * @param actionEvent the event which occured
+     * @param actionEvent the event which occurred
      */
     private void buttonPressed(ActionEvent actionEvent) {
         JButton button = (JButton) actionEvent.getSource();
@@ -62,7 +63,7 @@ public class GameView extends JPanel implements ActionListener{
         actionListeners.forEach(listener -> listener.actionPerformed(event));
     }
 
-    private void addActionListener(ActionListener listener) {
+    public void addActionListener(ActionListener listener) {
         actionListeners.add(listener);
     }
 
