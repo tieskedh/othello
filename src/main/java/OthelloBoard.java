@@ -4,17 +4,18 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.stream.IntStream;
 
 import gui.AbstractModel;
 
 public class OthelloBoard extends AbstractModel {
-    public static final int EMPTY = 0;
-    private int boardSize;
+    private static final int EMPTY = 0;
+    private final int BOARD_SIZE;
     private int board[][];
 
-    private String playerOne;
-    private String playerTwo;
-    private String currentPlayer;
+    private final String PLAYER_ONE_STRING;
+    private final String PLAYER_TWO_STRING;
+    private int currentPlayer;
     private int setLocation;
 
     public ActionListener view;
@@ -26,9 +27,9 @@ public class OthelloBoard extends AbstractModel {
     private int side;
 
     public OthelloBoard(int boardSize, String playerOne, String playerTwo) {
-        this.boardSize = boardSize;
-        this.playerOne = playerOne;
-        this.playerTwo = playerTwo;
+        this.BOARD_SIZE = boardSize;
+        this.PLAYER_ONE_STRING = playerOne;
+        this.PLAYER_TWO_STRING = playerTwo;
         board = new int[boardSize][boardSize];
     }
 
@@ -36,43 +37,29 @@ public class OthelloBoard extends AbstractModel {
         return board;
     }
 
-    public Point[] getPossibleMoves(String player) {
-        ArrayList<Point> moveList = new ArrayList<Point>();
-        for (int x = 0; x < boardSize; x++) {
-            for (int y = 0; y < boardSize; y++) {
-                Point location = new Point(x, y);
-                if (validateMove(location, player)) {
-                    moveList.add(location);
-                }
-            }
-        }
-
-        return moveList.toArray(new Point[0]);
-    }
-
-    public int getBoardSize() {
-        return boardSize;
-    }
 
     /*
     executes one move from the given player
      */
     public void doMove(Point location, String player) {
-        System.out.println("Do Move board entered");
-        if (validateMove(location, player)) {
-            placePiece(location, player);
-            ArrayList<Point> toFlip = new ArrayList<Point>();
+        System.out.println(location);
+        int playerNr = playerStringToInt(player);
+        if (isValidMove(location, playerNr)) {
+            setAtLocation(location, playerNr);
+            ArrayList<Point> toFlip = new ArrayList<>();
             //assemble list from each direction and add.
+
             ArrayList<Point> inputArray;
             for (int xOffset = -1; xOffset <= 1; xOffset++) {
                 for (int yOffset = -1; yOffset <= 1; yOffset++) {
-                    inputArray = checkLinePieces(location, xOffset, yOffset, player, toFlip);
+                    inputArray = checkLinePieces(location, xOffset, yOffset, player, new ArrayList<>());
 
-                    if (inputArray != null) {
+                    if (!inputArray.isEmpty()) {
                         toFlip.addAll(inputArray);
                     }
                 }
             }
+
 //            toFlip.addAll(checkLinePieces(location, 1, 0, player, toFlip));
 //            toFlip.addAll(checkLinePieces(location, 0, 1, player, toFlip));
 //            toFlip.addAll(checkLinePieces(location, -1, 0, player, toFlip));
@@ -81,7 +68,6 @@ public class OthelloBoard extends AbstractModel {
 //            toFlip.addAll(checkLinePieces(location, 1, -1, player, toFlip));
 //            toFlip.addAll(checkLinePieces(location, -1, 1, player, toFlip));
 //            toFlip.addAll(checkLinePieces(location, -1, -1, player, toFlip));
-            System.out.println(toFlip);
             toFlip.stream()
                     .distinct()
                     .forEach(this::flipPiece);
@@ -92,41 +78,31 @@ public class OthelloBoard extends AbstractModel {
         }
     }
 
+    private int getAtLocation(Point location) {
+        return board[location.x][location.y];
+    }
+    private void setAtLocation(Point location,int player) {
+        side = player;
+        board[location.x][location.y] = player;
+        setSetLocation(toInt(location));
+        System.out.println("fire event");
+        fireEvent(new ActionEvent(this, AbstractModel.PLACE_PIECE, "Place Piece"));
+    }
+
     /*
     flips the owner of the piece at the given coordinates.
      */
     private void flipPiece(Point location) {
-        if (board[location.x][location.y] == PLAYER_1) {
-            board[location.x][location.y] = PLAYER_2;
-        } else if (board[location.x][location.y] == PLAYER_2) {
-            board[location.x][location.y] = PLAYER_1;
+        if (getAtLocation(location)==PLAYER_1) {
+            setAtLocation(location, PLAYER_2);
+        } else if (getAtLocation(location) == PLAYER_2) {
+            setAtLocation(location, PLAYER_1);
         }
-        fireEvent(new ActionEvent(this, AbstractModel.PLACE_PIECE, "Flip Piece"));
-
-    }
-
-    /*
-     Flips the piece at the given coordinates.
-     */
-    private void placePiece(Point location, String player) throws IllegalStateException {
-        if (player.equals(playerOne)) {
-            side = PLAYER_1;
-        } else {
-            side = PLAYER_2;
-        }
-        board[location.x][location.y] = side;
-        setSetLocation(toInt(location));
-        System.out.println("fire event");
-        fireEvent(new ActionEvent(this, AbstractModel.PLACE_PIECE, "Place Piece"));
-
     }
 
 
     public boolean checkIfMatchDone() {
-        if (getPossibleMoves(playerOne) == null && getPossibleMoves(playerTwo) == null) {
-            return true;
-        }
-        return false;
+        return (getPossibleMoves(PLAYER_1).length == 0 && getPossibleMoves(PLAYER_2).length == 0);
     }
 
     public int getScore(String player) {
@@ -143,47 +119,34 @@ public class OthelloBoard extends AbstractModel {
         return total;
     }
 
-    public String getWinner() {
-        int player1 = getScore(playerOne);
-        int player2 = getScore(playerTwo);
-        if (player1 > player2) {
-            return playerOne;
-        }
-        if (player2 > player1) {
-            return playerTwo;
-        }
-        return null;
-
-    }
-
     public void clearBoard() {
-        for (int[] row : board) {
-            for (int point : row) {
-                point = 0;
-            }
-        }
+        board = new int[BOARD_SIZE][BOARD_SIZE];
     }
 
     public void prepareStandardGame() {
-        placePiece(new Point(1, 1), playerOne);
-        placePiece(new Point(2, 1), playerTwo);
-        placePiece(new Point(3, 1), playerTwo);
-
-        placePiece(new Point(1, 2), playerTwo);
-        placePiece(new Point(2, 2), playerOne);
+        setAtLocation(new Point(3, 3), PLAYER_1);
+        setAtLocation(new Point(4, 3), PLAYER_2);
+        setAtLocation(new Point(3, 4), PLAYER_2);
+        setAtLocation(new Point(4, 4), PLAYER_1);
     }
 
-    private boolean validateMove(Point location, String player) {
-        int playerNr = playerStringToInt(player);
+    public void prepareTestGame() {
+        setAtLocation(new Point(1, 1), PLAYER_1);
+        setAtLocation(new Point(2, 1), PLAYER_2);
+        setAtLocation(new Point(1, 2), PLAYER_2);
+        setAtLocation(new Point(2, 2), PLAYER_1);
+    }
+
+    private boolean isValidMove(Point location, int player) {
         if (board[location.x][location.y] == 0) {
-            if ((checkLineValidation(location, 1, 0, player) && board[location.x + 1][location.y] != playerNr) ||
-                    (checkLineValidation(location, 0, 1, player) && board[location.x][location.y + 1] != playerNr) ||
-                    (checkLineValidation(location, -1, 0, player) && board[location.x - 1][location.y] != playerNr) ||
-                    (checkLineValidation(location, 0, -1, player) && board[location.x][location.y - 1] != playerNr) ||
-                    (checkLineValidation(location, 1, 1, player) && board[location.x + 1][location.y + 1] != playerNr) ||
-                    (checkLineValidation(location, 1, -1, player) && board[location.x + 1][location.y - 1] != playerNr) ||
-                    (checkLineValidation(location, -1, 1, player) && board[location.x - 1][location.y + 1] != playerNr) ||
-                    (checkLineValidation(location, -1, -1, player) && board[location.x - 1][location.y - 1] != playerNr)
+            if ((checkLineValidation(location, 1, 0, player) && board[location.x + 1][location.y] != player) ||
+                    (checkLineValidation(location, 0, 1, player) && board[location.x][location.y + 1] != player) ||
+                    (checkLineValidation(location, -1, 0, player) && board[location.x - 1][location.y] != player) ||
+                    (checkLineValidation(location, 0, -1, player) && board[location.x][location.y - 1] != player) ||
+                    (checkLineValidation(location, 1, 1, player) && board[location.x + 1][location.y + 1] != player) ||
+                    (checkLineValidation(location, 1, -1, player) && board[location.x + 1][location.y - 1] != player) ||
+                    (checkLineValidation(location, -1, 1, player) && board[location.x - 1][location.y + 1] != player) ||
+                    (checkLineValidation(location, -1, -1, player) && board[location.x - 1][location.y - 1] != player)
                     ) {
                 return true;
             }
@@ -191,32 +154,17 @@ public class OthelloBoard extends AbstractModel {
         return false;
     }
 
-    private void dumpboard() {
-        for (int[] row : board
-                ) {
-            for (int position : row
-                    ) {
-                System.out.println(position);
 
-            }
-            System.out.println("\n");
-        }
-    }
-
-    /**
-     * first <= second <= third
-     */
     private boolean PointOutOfBounds(Point location) {
-        return location.x < 0 || location.x > boardSize - 1 || location.y < 0 || location.y > boardSize - 1;
+        return location.x < 0 || location.x > BOARD_SIZE - 1 || location.y < 0 || location.y > BOARD_SIZE - 1;
     }
 
-    private boolean checkLineValidation(Point location, int offsetX, int offsetY, String player) {
-        int playerNr = playerStringToInt(player);
+    private boolean checkLineValidation(Point location, int offsetX, int offsetY, int player) {
         Point testPoint = new Point(location);
         testPoint.move(testPoint.x + offsetX, testPoint.y + offsetY);
         if (PointOutOfBounds(testPoint) || board[testPoint.x][testPoint.y] == EMPTY) {
             return false;
-        } else if (board[testPoint.x][testPoint.y] == playerNr) {
+        } else if (board[testPoint.x][testPoint.y] == player) {
             return true;
         }
         return checkLineValidation(testPoint, offsetX, offsetY, player);
@@ -229,9 +177,9 @@ public class OthelloBoard extends AbstractModel {
 
         testPoint.move(testPoint.x + offsetX, testPoint.y + offsetY);
 
-        //If not piece or out of bounds, end empty
+        //If not piece or out of bounds and empty
         if (PointOutOfBounds(testPoint) || board[testPoint.x][testPoint.y] == 0) {
-            return null;
+            return new ArrayList<>();
         }
         //If it encounters another piece of the same player, end.
         if (board[testPoint.x][testPoint.y] == playerNr) {
@@ -244,17 +192,9 @@ public class OthelloBoard extends AbstractModel {
         }
     }
 
-    public void setPlayerOne(String player) {
-        playerOne = player;
-    }
-
-    public void setPlayerTwo(String player) {
-        playerTwo = player;
-    }
-
     //Replaces player name with player number
     private int playerStringToInt(String player) {
-        if (player == playerOne) {
+        if (player.equals(PLAYER_ONE_STRING)) {
             return PLAYER_1;
         } else {
             return PLAYER_2;
@@ -263,22 +203,27 @@ public class OthelloBoard extends AbstractModel {
     }
 
     private int toInt(Point point) {
-        return point.x * boardSize + point.y;
+        return point.x * BOARD_SIZE + point.y;
+    }
+
+    private int[] getPossibleMoves(int player) {
+
+        int[] test= IntStream.range(0, BOARD_SIZE * BOARD_SIZE)
+                .mapToObj(nr ->new Point(nr/ BOARD_SIZE, nr% BOARD_SIZE))
+                .filter(location -> isValidMove(location,player))
+                .mapToInt(this::toInt)
+                .toArray();
+        System.out.println(Arrays.toString(test));
+        return test;
     }
 
     @Override
     public int[] getValidSets() {
-        Point[] validPoints = getPossibleMoves(currentPlayer);
-        int[] toReturn = new int[validPoints.length];
-        int i = 0;
-        for (Point validPoint : validPoints) {
-            toReturn[i++] = toInt(validPoint);
-        }
-        return toReturn;
+        return getPossibleMoves(currentPlayer);
     }
 
     public void setCurrentPlayer(String currentPlayer) {
-        this.currentPlayer = currentPlayer;
+        this.currentPlayer = playerStringToInt(currentPlayer);
     }
 
     @Override
@@ -292,11 +237,11 @@ public class OthelloBoard extends AbstractModel {
         return side;
     }
 
-    public void setSetLocation(int setLocation) {
+    private void setSetLocation(int setLocation) {
         this.setLocation = setLocation;
     }
 
-    public void fireEvent(ActionEvent event) {
+    private void fireEvent(ActionEvent event) {
         for (ActionListener actionListener : actionListeners) {
             actionListener.actionPerformed(event);
         }
@@ -308,7 +253,6 @@ public class OthelloBoard extends AbstractModel {
 
     public void turnStart() {
         fireEvent(new ActionEvent(this, AbstractModel.TURN_START, "Begin Turn"));
-
     }
 
     public void turnEnd() {

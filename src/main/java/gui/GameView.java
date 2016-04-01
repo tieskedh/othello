@@ -39,7 +39,7 @@ public class GameView extends JPanel implements ActionListener{
         IntStream.range(0, size)
                 .forEach(nr-> {
                     JButton button = new JButton();
-                    button.setEnabled(true);
+                    button.setEnabled(false);
                     button.addActionListener(this::buttonPressed);
                     buttons[nr] = button;
                     add(button);
@@ -89,6 +89,9 @@ public class GameView extends JPanel implements ActionListener{
                 int place = model.getSetLocation();
                 JButton button = buttons[place];
                 button.setText(players.getOrDefault(model.getSide(), ""));
+                break;
+                default:
+                    break;
         }
     }
 }
