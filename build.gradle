@@ -1,5 +1,6 @@
 group 'ptgf'
-version '0.1-SNAPSHOT'
+def buildNumber = System.getenv("bamboo_buildNumber") ?: "SNAPSHOT";
+version = '0.1-' + buildNumber
 
 apply plugin: 'java'
 
