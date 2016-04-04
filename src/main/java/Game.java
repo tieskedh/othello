@@ -27,7 +27,7 @@ public class Game extends AbstractModel{
 
     private void doMove(Point location) {
 
-        System.out.println(currentPlayer);
+        System.out.println("doMove player: "+currentPlayer);
         if (board.doMove(location, currentPlayer)) {
             setSide = currentPlayer;
             endTurn();

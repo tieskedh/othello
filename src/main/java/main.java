@@ -7,7 +7,7 @@ import java.awt.*;
 public class main {
     public static void main(String[] args) {
         GameModule module = new GameModule("1","2");
-        module.setClientBegins(true);
+        module.setClientBegins(false);
         module.start();
         JFrame frame = new JFrame("Othello");
         BorderLayout layout = new BorderLayout();

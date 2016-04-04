@@ -151,9 +151,6 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
     public void start() throws IllegalStateException {
         game.prepareStandardGame();
         matchStatus = MATCH_STARTED;
-        if(game.isClientsTurn()) {
-            game.setClientBegins(true);
-        }
     }
 
     private String otherPlayer(String player) {
