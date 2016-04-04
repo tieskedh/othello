@@ -64,7 +64,7 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
         }
 
         if (!game.getCurrentPlayer().equals(player)) {
-            throw new IllegalStateException("Not this player's turn.");
+            throw new IllegalStateException("IT is not the turn of: "+player);
         }
 
         game.doMove(Integer.parseInt(move));
