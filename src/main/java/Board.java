@@ -7,7 +7,7 @@ import java.util.stream.IntStream;
 /**
  * Created by thijs on 3-4-2016.
  */
-public class Board {
+public class Board{
     /** represents a space where no piece is placed */
     private static final int EMPTY = 0;
     /** represents a space with a piece of the client */
@@ -16,14 +16,16 @@ public class Board {
     private static final int PLAYER_2 = 2;
     /** represents the size of a side of the board */
     private final int BOARD_SIZE;
-
     private int board[][];
+    private Game game;
+
 
     /**
      * Creates a board by the given size
      * @param boardSize the size of a side of the board
      */
-    public Board(int boardSize){
+    public Board(int boardSize, Game game){
+        this.game = game;
         BOARD_SIZE = boardSize;
         board = new int[BOARD_SIZE][BOARD_SIZE];
     }
@@ -69,13 +71,16 @@ public class Board {
     }
 
     /**
-     * Sets the value of the given location\
+     * Sets the value of the given location
      * @param location The location where to set the value from
      * @param player the player which needs to be placed at the given location
      */
     private void setAtLocation(Point location, int player) {
         board[location.x][location.y] = player;
+        game.piecePlaced(location, player);
     }
+
+
 
     /**
      * Flips the side of a piece.
@@ -84,7 +89,7 @@ public class Board {
      */
     private void flipPiece(Point location) {
         if(getAtLocation(location) == 0) return;
-        setAtLocation(location, 1-getAtLocation(location));
+        setAtLocation(location, 3-getAtLocation(location));
     }
 
     /**
@@ -143,11 +148,11 @@ public class Board {
         testPoint.move(testPoint.x + offsetX, testPoint.y + offsetY);
 
         //If not piece or out of bounds and empty
-        if (PointOutOfBounds(testPoint) || board[testPoint.x][testPoint.y] == 0) {
+        if (PointOutOfBounds(testPoint) || getAtLocation(testPoint)== 0 || (offsetX==0&& offsetY==0)) {
             return new ArrayList<>();
         }
         //If it encounters another piece of the same player, end.
-        if (board[testPoint.x][testPoint.y] == player) {
+        if (getAtLocation(testPoint) == player) {
             return piecesList;
         } else {
             //if it encounters a piece of the opposite player, add to fliplist.
@@ -175,7 +180,7 @@ public class Board {
     public Point[] getPossibleMoves(int player) {
 
         Point[] test= IntStream.range(0, BOARD_SIZE * BOARD_SIZE)
-                .mapToObj(nr ->new Point(nr/ BOARD_SIZE, nr% BOARD_SIZE))
+                .mapToObj(nr ->new Point(nr/ BOARD_SIZE, nr % BOARD_SIZE))
                 .filter(location -> isValidMove(location,player))
                 .toArray(Point[]::new);
         System.out.println(Arrays.toString(test));
@@ -191,12 +196,14 @@ public class Board {
      * @return the move is possible
      */
     public boolean isValidMove(Point location, int player) {
-        return IntStream.range(0, 8)
-                .mapToObj(nr->checkLinePieces(location, nr/3-1,nr%3-1,player, new ArrayList<>()))
-                .noneMatch(ArrayList::isEmpty);
+        return !IntStream.range(0, 8)
+            .mapToObj(nr->checkLinePieces(location, nr/3-1,nr%3-1, player, new ArrayList<>()))
+            .allMatch(ArrayList::isEmpty);
     }
 
     public int getSize() {
         return BOARD_SIZE;
     }
+
+
 }

@@ -9,18 +9,15 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 public class GameModule extends ClientAbstractGameModule implements ActionListener {
-    private static final int BOARD_SIZE = 4;
+    private static final int BOARD_SIZE = 8;
     private GameView gameView;
 
     private HashMap<String, Integer> playerResults = new HashMap<>();
     private String moveDetails;
 
-    private ActionListener actionListener;
-    private LinkedList<ActionListener> actionListeners = new LinkedList<>();
     private LinkedList<MoveListener> moveListeners = new LinkedList<>();
 
-    public static final String GAME_TYPE = "OTHELLO";
-    public final Board board;
+    public static final String GAME_TYPE = "REVERSI";
     public final Game game;
     /**
      * Mandatory constructor.
@@ -32,16 +29,14 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
      */
     public GameModule(String playerOne, String playerTwo) {
         super(playerOne, playerTwo);
-        board = new Board(BOARD_SIZE);
-        game = new Game(board, playerOne, playerTwo);
+        game = new Game(BOARD_SIZE, playerOne, playerTwo);
 
         HashMap<Integer, String> players = new HashMap<>();
         players.put(1, playerOne);
         players.put(2, playerTwo);
         gameView = new GameView(BOARD_SIZE, BOARD_SIZE, players);
-
-//        board.addActionListener(gameView);
-//        gameView.addActionListener(this);
+        game.addActionListener(gameView);
+        gameView.addActionListener(this);
     }
 
 
@@ -89,7 +84,6 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
             throw new IllegalStateException("Illegal match state");
         }
         return game.getScore(player);
-
     }
 
     @Override
@@ -97,7 +91,6 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
         if (matchStatus != MATCH_FINISHED) {
             throw new IllegalStateException("Illegal match state");
         }
-
         return "The match has come to an end.";
     }
 
@@ -118,12 +111,13 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
         return moveDetails;
     }
 
+
     @Override
     public String getPlayerToMove() throws IllegalStateException {
         if (matchStatus != MATCH_STARTED) {
             throw new IllegalStateException("Illegal match state");
         }
-        return game.getNextPlayer();
+        return game.getCurrentPlayer();
     }
 
     @Override
@@ -145,11 +139,15 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
     public void setClientBegins(boolean clientBegins) {
         game.setClientBegins(true);
     }
+
+    @Override // TODO: 4-4-2016 implement 
+    public String getAIMove() {
+        return null;
+    }
+
     @Override
     public void start() throws IllegalStateException {
-        game.getBoard().prepareStandardGame();
-//        game.getBoard().prepareTestGame();
-        game.turnStart();
+        game.prepareStandardGame();
         matchStatus = MATCH_STARTED;
     }
 
@@ -157,17 +155,7 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
         return player.equals(playerOne) ? playerTwo : playerOne;
     }
 
-    private Point moveStringToPoint(String move) {
-        //expects 0-63
-        int moveInt = Integer.parseInt(move);
-        return new Point(
-            moveInt / BOARD_SIZE,
-            moveInt % BOARD_SIZE
-        );
-    }
-
     public void addMoveListener(MoveListener movelistener) {
         moveListeners.add(movelistener);
     }
-
 }

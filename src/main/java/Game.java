@@ -1,10 +1,10 @@
 import gui.AbstractModel;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.LinkedList;
-import java.util.stream.IntStream;
 
 /**
  * Created by thijs on 3-4-2016.
@@ -14,25 +14,28 @@ public class Game extends AbstractModel{
     private final String PLAYER_TWO_STRING;
     private final Board board;
     private int currentPlayer;
+    private int setSide;
     private int setLocation;
 
-    private LinkedList<ActionListener> actionListeners;
+    private LinkedList<ActionListener> listeners = new LinkedList<>();
 
-    public Game(Board board, String playerOne, String playerTwo) {
+    public Game(int boardSize, String playerOne, String playerTwo) {
         PLAYER_ONE_STRING = playerOne;
         PLAYER_TWO_STRING = playerTwo;
-        this.board = board;
-        actionListeners = new LinkedList<>();
+        this.board = new Board(boardSize, this);
     }
 
-    public boolean doMove(Point location) {
-        return board.doMove(location, currentPlayer);
-//            throw new IllegalStateException("False move. Not allowed.");
+    private void doMove(Point location) {
+        if (board.doMove(location, currentPlayer)) {
+            setSide = currentPlayer;
+            endTurn();
+        }
+        throw new IllegalStateException("False move. Not allowed.");
     }
 
-    public boolean doMove(int location) {
+    public void doMove(int location) {
         Point locationPoint = intToPoint(location);
-        return board.doMove(locationPoint, currentPlayer);
+        doMove(locationPoint);
     }
 
     public boolean checkIfMatchDone() {
@@ -62,22 +65,28 @@ public class Game extends AbstractModel{
     @Override
     public int[] getValidSets() {
         return Arrays.stream(board.getPossibleMoves(currentPlayer))
-        .mapToInt(this::pointToInt)
-        .toArray();
+                .mapToInt(this::pointToInt)
+                .toArray();
+    }
+
+    private void setClientTurn() {
+        fire(new ActionEvent(this, AbstractModel.TURN_START, "CLIENT IS ON SET"));
     }
 
     @Override
     public int getSetLocation() {
-        return 0;
+        return setLocation;
     }
 
     @Override
     public int getSide() {
-        return currentPlayer;
+        return setSide;
     }
 
-    public void addActionListener(ActionListener listener) {
-        actionListeners.add(listener);
+    public void addActionListener(ActionListener listener) { listeners.add(listener);}
+
+    public void fire(ActionEvent event) {
+        listeners.forEach(listener -> listener.actionPerformed(event));
     }
 
     private String playerToString(int playerNr) {
@@ -87,6 +96,7 @@ public class Game extends AbstractModel{
             default: return "UNKNOWN";
         }
     }
+
     private int playerToInt(String player) {
         if(player.equals(PLAYER_ONE_STRING)) return 1;
         if(player.equals(PLAYER_TWO_STRING)) return 2;
@@ -113,7 +123,24 @@ public class Game extends AbstractModel{
 
 
     public void endTurn() {
-        currentPlayer = 1-currentPlayer;
+        currentPlayer = 3-currentPlayer;
+        if(board.getPossibleMoves(currentPlayer).length==0) {
+            currentPlayer = 3-currentPlayer;
+        }
+        if(board.getPossibleMoves(currentPlayer).length==0) {
+            //game finished
+        } else {
+            if(currentPlayer==1) {
+                setClientTurn();
+            } else {
+                setOponentTurn();
+            }
+        }
+    }
+
+    private void setOponentTurn() {
+        currentPlayer = 2;
+        fire(new ActionEvent(this, AbstractModel.TURN_END, "COMPUTER_TURN"));
     }
 
     public String getCurrentPlayer() {
@@ -124,4 +151,15 @@ public class Game extends AbstractModel{
         return playerToString(1-currentPlayer);
     }
 
+    public void prepareStandardGame() {
+        board.prepareStandardGame();
+        fire(new ActionEvent(this, AbstractModel.TURN_START, "GAME STARTED"));
+
+    }
+
+    public void piecePlaced(Point location, int player) {
+        setLocation = pointToInt(location);
+        setSide = player;
+        fire(new ActionEvent(this, AbstractModel.PLACE_PIECE, "PIECE PLACED"));
+    }
 }

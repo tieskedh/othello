@@ -25,6 +25,7 @@ public abstract class AbstractModel {
      */
     public abstract int getSide();
 
+
     /** eventID at the start of the game */
     public static final int TURN_START = 0;
     /** eventID at the end of the game */

@@ -15,7 +15,8 @@ repositories {
 }
 
 dependencies {
-    compile name: 'clientgamemodule-0.2'
+
+    compile name: 'clientgamemodule-0.3'
     compile name: 'gamemodule-1.0'
 }
 
