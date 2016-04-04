@@ -26,11 +26,14 @@ public class Game extends AbstractModel{
     }
 
     private void doMove(Point location) {
+
+        System.out.println(currentPlayer);
         if (board.doMove(location, currentPlayer)) {
             setSide = currentPlayer;
             endTurn();
+        } else {
+            throw new IllegalStateException("False move. Not allowed.");
         }
-        throw new IllegalStateException("False move. Not allowed.");
     }
 
     public void doMove(int location) {
@@ -62,6 +65,8 @@ public class Game extends AbstractModel{
         currentPlayer = (clientBegins)? 1: 2;
         if(currentPlayer==1) {
             setClientTurn();
+        } else {
+            setOponentTurn();
         }
     }
 
