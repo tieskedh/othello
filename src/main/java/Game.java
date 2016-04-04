@@ -28,8 +28,8 @@ public class Game extends AbstractModel{
 
     private void doMove(Point location) {
 
-        System.out.println("doMove player: "+currentPlayer);
         if (board.doMove(location, currentPlayer)) {
+            System.out.println("doMove player: "+currentPlayer+"did move "+location);
             setSide = currentPlayer;
             endTurn();
         } else {
@@ -62,9 +62,11 @@ public class Game extends AbstractModel{
     public void setClientBegins(boolean clientBegins) {
         startingPlayer = (clientBegins)? 1: 2;
         currentPlayer = startingPlayer;
-        if(currentPlayer==1) {
+        if(clientBegins) {
+            System.out.println("Client should begin");
             setClientTurn();
         } else {
+            System.out.println("Oponent should begin");
             setOponentTurn();
         }
     }
@@ -77,6 +79,7 @@ public class Game extends AbstractModel{
     }
 
     private void setClientTurn() {
+        System.out.println("CLient can perform move");
         fire(new ActionEvent(this, AbstractModel.TURN_START, "CLIENT IS ON SET"));
     }
 
@@ -130,20 +133,21 @@ public class Game extends AbstractModel{
 
 
     public void endTurn() {
+        System.out.println("turn ended");
         currentPlayer = 3-currentPlayer;
         if(board.getPossibleMoves(currentPlayer).length==0) {
+            System.out.println("No possible moves for " + currentPlayer);
             currentPlayer = 3 - currentPlayer;
             if (board.getPossibleMoves(currentPlayer).length == 0) {
                 //game finished
-            } else {
-                setOponentTurn();
             }
-        }else {
-            setClientTurn();
         }
+        if(currentPlayer==1) setClientTurn();
+        if(currentPlayer==2) setOponentTurn();
     }
 
     private void setOponentTurn() {
+        System.out.println("It's the turn of the opponent");
         currentPlayer = 2;
         fire(new ActionEvent(this, AbstractModel.TURN_END, "COMPUTER_TURN"));
     }
@@ -163,6 +167,5 @@ public class Game extends AbstractModel{
         setLocation = pointToInt(location);
         setSide = player;
         fire(new ActionEvent(this, AbstractModel.PLACE_PIECE, "PIECE PLACED"));
-        endTurn();
     }
 }

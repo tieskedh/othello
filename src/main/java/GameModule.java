@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.logging.Logger;
 
 public class GameModule extends ClientAbstractGameModule implements ActionListener {
     private static final int BOARD_SIZE = 8;
@@ -29,6 +30,12 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
      */
     public GameModule(String playerOne, String playerTwo) {
         super(playerOne, playerTwo);
+        
+        // TODO: 4-4-2016 remove
+        System.out.println("GameModule.GameModule");
+        System.out.println("playerOne = [" + playerOne + "], playerTwo = [" + playerTwo + "]");
+
+        
         game = new Game(BOARD_SIZE, playerOne, playerTwo);
 
         HashMap<Integer, String> players = new HashMap<>();
@@ -46,18 +53,19 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
     }
 
     public void actionPerformed(ActionEvent e) {
-        System.out.println("doMove  module reached");
+        System.out.println("action performed"+e.getID());
         if(game.isClientsTurn()) {
             game.doMove(e.getID());
-        }
-        for (MoveListener moveListener : moveListeners) {
-            moveListener.movePerformed(String.valueOf(e.getID()));
+            for (MoveListener moveListener : moveListeners) {
+                moveListener.movePerformed(String.valueOf(e.getID()));
+            }
+            System.out.println("Move carried out");
         }
     }
 
     @Override
     public void doPlayerMove(String player, String move) throws IllegalStateException {
-        System.out.println("do player move");
+        System.out.println("doPlayerMove: "+player+"wants to do move "+move);
         // string in de vorm van 0-63 / 0-8,0-8 binnen
         if (matchStatus != MATCH_STARTED) {
             throw new IllegalStateException("Illegal match state");
@@ -67,8 +75,11 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
             throw new IllegalStateException("IT is not the turn of: "+player);
         }
 
+        System.out.println("Move carried out");
         game.doMove(Integer.parseInt(move));
+
         if (game.checkIfMatchDone()) {
+            System.out.println("Match finished");
             matchStatus = MATCH_FINISHED;
             moveDetails = "Done";
             playerResults.put(player, PLAYER_WIN);
@@ -118,6 +129,7 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
         if (matchStatus != MATCH_STARTED) {
             throw new IllegalStateException("Illegal match state");
         }
+        System.out.println(game.getCurrentPlayer()+" should do the next move");
         return game.getCurrentPlayer();
     }
 
