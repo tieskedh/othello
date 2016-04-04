@@ -76,7 +76,7 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
             System.out.println("MATCH IS OVER");
         } else {
             moveDetails = "Next";
-            game.endTurn();
+            //game.endTurn();
         }
     }
 
