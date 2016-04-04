@@ -150,6 +150,7 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
     @Override
     public void start() throws IllegalStateException {
         game.prepareStandardGame();
+
         matchStatus = MATCH_STARTED;
     }
 

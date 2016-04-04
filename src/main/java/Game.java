@@ -10,9 +10,10 @@ import java.util.LinkedList;
  * Created by thijs on 3-4-2016.
  */
 public class Game extends AbstractModel{
-    private final String PLAYER_ONE_STRING;
-    private final String PLAYER_TWO_STRING;
+    private final String CLIENT_NAME;
+    private final String OPONENT_NAME;
     private final Board board;
+    private int startingPlayer;
     private int currentPlayer;
     private int setSide;
     private int setLocation;
@@ -20,8 +21,8 @@ public class Game extends AbstractModel{
     private LinkedList<ActionListener> listeners = new LinkedList<>();
 
     public Game(int boardSize, String playerOne, String playerTwo) {
-        PLAYER_ONE_STRING = playerOne;
-        PLAYER_TWO_STRING = playerTwo;
+        CLIENT_NAME = playerOne;
+        OPONENT_NAME = playerTwo;
         this.board = new Board(boardSize, this);
     }
 
@@ -49,9 +50,6 @@ public class Game extends AbstractModel{
         return board.getOccurrences(playerToInt(player));
     }
 
-    public Board getBoard() {
-        return board;
-    }
 
     public boolean isValidMove(Point location) {
         return board.isValidMove(location, currentPlayer);
@@ -62,7 +60,8 @@ public class Game extends AbstractModel{
     }
 
     public void setClientBegins(boolean clientBegins) {
-        currentPlayer = (clientBegins)? 1: 2;
+        startingPlayer = (clientBegins)? 1: 2;
+        currentPlayer = startingPlayer;
         if(currentPlayer==1) {
             setClientTurn();
         } else {
@@ -99,15 +98,15 @@ public class Game extends AbstractModel{
 
     private String playerToString(int playerNr) {
         switch (playerNr) {
-            case 1: return PLAYER_ONE_STRING;
-            case 2: return PLAYER_TWO_STRING;
+            case 1: return CLIENT_NAME;
+            case 2: return OPONENT_NAME;
             default: return "UNKNOWN";
         }
     }
 
     private int playerToInt(String player) {
-        if(player.equals(PLAYER_ONE_STRING)) return 1;
-        if(player.equals(PLAYER_TWO_STRING)) return 2;
+        if(player.equals(CLIENT_NAME)) return 1;
+        if(player.equals(OPONENT_NAME)) return 2;
         return -1;
     }
 
@@ -155,12 +154,9 @@ public class Game extends AbstractModel{
         return playerToString(currentPlayer);
     }
 
-    public String getNextPlayer() {
-        return playerToString(1-currentPlayer);
-    }
-
     public void prepareStandardGame() {
         board.prepareStandardGame();
+        currentPlayer = (startingPlayer==0)? currentPlayer : startingPlayer;
         fire(new ActionEvent(this, AbstractModel.TURN_START, "GAME STARTED"));
 
     }
