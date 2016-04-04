@@ -3,6 +3,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.stream.IntStream;
 
@@ -18,7 +19,6 @@ public class OthelloBoard extends AbstractModel {
     private int currentPlayer;
     private int setLocation;
 
-    public ActionListener view;
     private LinkedList<ActionListener> actionListeners = new LinkedList<>();
 
     //the digits on the internal board.
@@ -45,33 +45,13 @@ public class OthelloBoard extends AbstractModel {
         System.out.println(location);
         int playerNr = playerStringToInt(player);
         if (isValidMove(location, playerNr)) {
-            setAtLocation(location, playerNr);
-            ArrayList<Point> toFlip = new ArrayList<>();
             //assemble list from each direction and add.
 
-            ArrayList<Point> inputArray;
-            for (int xOffset = -1; xOffset <= 1; xOffset++) {
-                for (int yOffset = -1; yOffset <= 1; yOffset++) {
-                    inputArray = checkLinePieces(location, xOffset, yOffset, player, new ArrayList<>());
-
-                    if (!inputArray.isEmpty()) {
-                        toFlip.addAll(inputArray);
-                    }
-                }
-            }
-
-//            toFlip.addAll(checkLinePieces(location, 1, 0, player, toFlip));
-//            toFlip.addAll(checkLinePieces(location, 0, 1, player, toFlip));
-//            toFlip.addAll(checkLinePieces(location, -1, 0, player, toFlip));
-//            toFlip.addAll(checkLinePieces(location, 0, -1, player, toFlip));
-//            toFlip.addAll(checkLinePieces(location, 1, 1, player, toFlip));
-//            toFlip.addAll(checkLinePieces(location, 1, -1, player, toFlip));
-//            toFlip.addAll(checkLinePieces(location, -1, 1, player, toFlip));
-//            toFlip.addAll(checkLinePieces(location, -1, -1, player, toFlip));
-            toFlip.stream()
+            IntStream.range(0, 8)
+                    .mapToObj(nr->checkLinePieces(location, nr/3-1,nr%3-1,playerNr, new ArrayList<>()))
+                    .flatMap(Collection::stream)
                     .distinct()
                     .forEach(this::flipPiece);
-
             System.out.println(Arrays.deepToString(board));
         } else {
             throw new IllegalStateException("False move. Not allowed.");
@@ -138,41 +118,18 @@ public class OthelloBoard extends AbstractModel {
     }
 
     private boolean isValidMove(Point location, int player) {
-        if (board[location.x][location.y] == 0) {
-            if ((checkLineValidation(location, 1, 0, player) && board[location.x + 1][location.y] != player) ||
-                    (checkLineValidation(location, 0, 1, player) && board[location.x][location.y + 1] != player) ||
-                    (checkLineValidation(location, -1, 0, player) && board[location.x - 1][location.y] != player) ||
-                    (checkLineValidation(location, 0, -1, player) && board[location.x][location.y - 1] != player) ||
-                    (checkLineValidation(location, 1, 1, player) && board[location.x + 1][location.y + 1] != player) ||
-                    (checkLineValidation(location, 1, -1, player) && board[location.x + 1][location.y - 1] != player) ||
-                    (checkLineValidation(location, -1, 1, player) && board[location.x - 1][location.y + 1] != player) ||
-                    (checkLineValidation(location, -1, -1, player) && board[location.x - 1][location.y - 1] != player)
-                    ) {
-                return true;
-            }
-        }
-        return false;
+        return IntStream.range(0, 8)
+                .mapToObj(nr->checkLinePieces(location, nr/3-1,nr%3-1,player, new ArrayList<>()))
+                .noneMatch(ArrayList::isEmpty);
     }
+
 
 
     private boolean PointOutOfBounds(Point location) {
         return location.x < 0 || location.x > BOARD_SIZE - 1 || location.y < 0 || location.y > BOARD_SIZE - 1;
     }
 
-    private boolean checkLineValidation(Point location, int offsetX, int offsetY, int player) {
-        Point testPoint = new Point(location);
-        testPoint.move(testPoint.x + offsetX, testPoint.y + offsetY);
-        if (PointOutOfBounds(testPoint) || board[testPoint.x][testPoint.y] == EMPTY) {
-            return false;
-        } else if (board[testPoint.x][testPoint.y] == player) {
-            return true;
-        }
-        return checkLineValidation(testPoint, offsetX, offsetY, player);
-    }
-
-
-    private ArrayList<Point> checkLinePieces(Point location, int offsetX, int offsetY, String player, ArrayList<Point> piecesList) {
-        int playerNr = playerStringToInt(player);
+    private ArrayList<Point> checkLinePieces(Point location, int offsetX, int offsetY, int player, ArrayList<Point> piecesList) {
         Point testPoint = new Point(location);
 
         testPoint.move(testPoint.x + offsetX, testPoint.y + offsetY);
@@ -182,7 +139,7 @@ public class OthelloBoard extends AbstractModel {
             return new ArrayList<>();
         }
         //If it encounters another piece of the same player, end.
-        if (board[testPoint.x][testPoint.y] == playerNr) {
+        if (board[testPoint.x][testPoint.y] == player) {
             return piecesList;
         } else {
             //if it encounters a piece of the opposite player, add to fliplist.
