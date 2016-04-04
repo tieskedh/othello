@@ -62,7 +62,7 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
             throw new IllegalStateException("Illegal match state");
         }
 
-        if (!game.getNextPlayer().equals(player)) {
+        if (!game.getCurrentPlayer().equals(player)) {
             throw new IllegalStateException("Not this player's turn.");
         }
 
@@ -112,7 +112,6 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
         return moveDetails;
     }
 
-
     @Override
     public String getPlayerToMove() throws IllegalStateException {
         if (matchStatus != MATCH_STARTED) {
@@ -137,8 +136,9 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
         return (moveDetails == null)? "Place your piece." : moveDetails;
     }
 
+    @Override
     public void setClientBegins(boolean clientBegins) {
-        game.setClientBegins(true);
+        game.setClientBegins(clientBegins);
     }
 
     @Override // TODO: 4-4-2016 implement 
@@ -158,7 +158,6 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
     private String otherPlayer(String player) {
         return player.equals(playerOne) ? playerTwo : playerOne;
     }
-
     public void addMoveListener(MoveListener movelistener) {
         moveListeners.add(movelistener);
     }
