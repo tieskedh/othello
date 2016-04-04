@@ -34,7 +34,6 @@ public class Game extends AbstractModel{
         if (board.doMove(location, currentPlayer)) {
             System.out.println("doMove player: "+currentPlayer+"did move "+location);
             setSide = currentPlayer;
-            endTurn();
         } else {
             throw new IllegalStateException("False move. Not allowed.");
         }
