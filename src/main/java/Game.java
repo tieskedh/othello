@@ -60,6 +60,9 @@ public class Game extends AbstractModel{
 
     public void setClientBegins(boolean clientBegins) {
         currentPlayer = (clientBegins)? 1: 2;
+        if(currentPlayer==1) {
+            setClientTurn();
+        }
     }
 
     @Override
@@ -161,5 +164,6 @@ public class Game extends AbstractModel{
         setLocation = pointToInt(location);
         setSide = player;
         fire(new ActionEvent(this, AbstractModel.PLACE_PIECE, "PIECE PLACED"));
+        endTurn();
     }
 }
