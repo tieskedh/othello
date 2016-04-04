@@ -47,9 +47,9 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
 
     public void actionPerformed(ActionEvent e) {
         System.out.println("doMove  module reached");
-//        if(game.isClientsTurn()) {
-//            game.doMove(e.getID());
-//        }
+        if(game.isClientsTurn()) {
+            game.doMove(e.getID());
+        }
         for (MoveListener moveListener : moveListeners) {
             moveListener.movePerformed(String.valueOf(e.getID()));
         }

@@ -12,11 +12,11 @@ public class main {
         JFrame frame = new JFrame("Othello");
         BorderLayout layout = new BorderLayout();
         frame.setLayout(layout);
-
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.add(module.getView(), BorderLayout.CENTER);
         frame.pack();
         frame.setVisible(true);
+        module.doPlayerMove("2", "37");
 
     }
 }
