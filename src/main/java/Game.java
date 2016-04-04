@@ -5,13 +5,16 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.stream.Stream;
 
 /**
  * Created by thijs on 3-4-2016.
  */
 public class Game extends AbstractModel{
-    private final String CLIENT_NAME;
-    private final String OPONENT_NAME;
+    private final String STARTING_PLAYER;
+    private final String SECOND_PLAYER;
+    private String CLIENT; //should only be set from setClientStarts
+    private String OPONENT;//should only be set from setClientStarts
     private final Board board;
     private int startingPlayer;
     private int currentPlayer;
@@ -21,8 +24,8 @@ public class Game extends AbstractModel{
     private LinkedList<ActionListener> listeners = new LinkedList<>();
 
     public Game(int boardSize, String playerOne, String playerTwo) {
-        CLIENT_NAME = playerOne;
-        OPONENT_NAME = playerTwo;
+        STARTING_PLAYER = playerOne;
+        SECOND_PLAYER = playerTwo;
         this.board = new Board(boardSize, this);
     }
 
@@ -63,9 +66,13 @@ public class Game extends AbstractModel{
         startingPlayer = (clientBegins)? 1: 2;
         currentPlayer = startingPlayer;
         if(clientBegins) {
+            CLIENT = STARTING_PLAYER;
+            OPONENT = SECOND_PLAYER;
             System.out.println("Client should begin");
             setClientTurn();
         } else {
+            OPONENT = STARTING_PLAYER;
+            CLIENT = SECOND_PLAYER;
             System.out.println("Oponent should begin");
             setOponentTurn();
         }
@@ -101,15 +108,15 @@ public class Game extends AbstractModel{
 
     private String playerToString(int playerNr) {
         switch (playerNr) {
-            case 1: return CLIENT_NAME;
-            case 2: return OPONENT_NAME;
+            case 1: return CLIENT;
+            case 2: return OPONENT;
             default: return "UNKNOWN";
         }
     }
 
     private int playerToInt(String player) {
-        if(player.equals(CLIENT_NAME)) return 1;
-        if(player.equals(OPONENT_NAME)) return 2;
+        if(player.equals(CLIENT)) return 1;
+        if(player.equals(OPONENT)) return 2;
         return -1;
     }
 
