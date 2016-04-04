@@ -17,7 +17,7 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
 
     private LinkedList<MoveListener> moveListeners = new LinkedList<>();
 
-    public static final String GAME_TYPE = "REVERSI";
+    public static final String GAME_TYPE = "Reversi";
     public final Game game;
     /**
      * Mandatory constructor.
