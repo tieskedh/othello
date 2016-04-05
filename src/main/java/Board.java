@@ -80,8 +80,6 @@ public class Board{
         game.piecePlaced(location, player);
     }
 
-
-
     /**
      * Flips the side of a piece.
      * If no Piece is placed, keeps the field untouched
@@ -114,12 +112,13 @@ public class Board{
     /**
      * Prepares a standard 8 by 8 game.
      */
-    public void prepareStandardGame() {
+    public void prepareStandardGame(boolean clientBegins) {
         clear();
-        setAtLocation(new Point(3, 3), PLAYER_1);
-        setAtLocation(new Point(4, 3), PLAYER_2);
-        setAtLocation(new Point(3, 4), PLAYER_2);
-        setAtLocation(new Point(4, 4), PLAYER_1);
+        setAtLocation(new Point(3, 3), PLAYER_2);
+        setAtLocation(new Point(4, 3), PLAYER_1);
+        setAtLocation(new Point(3, 4), PLAYER_1);
+        setAtLocation(new Point(4, 4), PLAYER_2);
+
     }
 
     /**
@@ -196,6 +195,7 @@ public class Board{
      * @return the move is possible
      */
     public boolean isValidMove(Point location, int player) {
+        if(getAtLocation(location)!=0) return false;
         return !IntStream.range(0, 8)
             .mapToObj(nr->checkLinePieces(location, nr/3-1,nr%3-1, player, new ArrayList<>()))
             .allMatch(ArrayList::isEmpty);

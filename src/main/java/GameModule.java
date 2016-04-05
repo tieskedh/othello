@@ -7,7 +7,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.logging.Logger;
 
 public class GameModule extends ClientAbstractGameModule implements ActionListener {
     private static final int BOARD_SIZE = 8;
@@ -78,7 +77,6 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
         game.doMove(Integer.parseInt(move));
 
         if (game.checkIfMatchDone()) {
-            System.out.println("Match finished");
             matchStatus = MATCH_FINISHED;
             moveDetails = "Done";
             playerResults.put(player, PLAYER_WIN);
@@ -86,7 +84,7 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
             System.out.println("MATCH IS OVER");
         } else {
             moveDetails = "Next";
-            //game.endTurn();
+            game.endTurn();
         }
     }
 

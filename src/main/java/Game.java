@@ -5,36 +5,101 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.LinkedList;
-import java.util.stream.Stream;
 
 /**
  * Created by thijs on 3-4-2016.
  */
 public class Game extends AbstractModel{
-    private final String STARTING_PLAYER;
-    private final String SECOND_PLAYER;
-    private String CLIENT; //should only be set from setClientStarts
-    private String OPONENT;//should only be set from setClientStarts
     private final Board board;
-    private int startingPlayer;
-    private int currentPlayer;
     private int setSide;
     private int setLocation;
 
     private LinkedList<ActionListener> listeners = new LinkedList<>();
+    private boolean clientStart;
+
+    private Players players;
+    public boolean isClientsTurn() {
+        return players.currentPlayer == players.playerToInt(players.CLIENT);
+    }
+
+    private class Players {
+        private final String STARTING_PLAYER;
+        private final String SECOND_PLAYER;
+        private String CLIENT;
+        private String OPONENT;
+        private int currentPlayer = 1;
+
+        public Players(String playerOne, String playerTwo) {
+            STARTING_PLAYER = playerOne;
+            SECOND_PLAYER = playerTwo;
+        }
+
+        public void togglePlayer() {
+            currentPlayer = 3-currentPlayer;
+        }
+        int playerToInt(String player) {
+            if(player.equals(STARTING_PLAYER)) {
+                return 1;
+            } else if(player.equals(SECOND_PLAYER)) {
+                return 2;
+            } else {
+                return -1;
+            }
+        }
+
+        String playerToString(int nr) {
+            switch (nr) {
+                case 1: return STARTING_PLAYER;
+                case 2:return SECOND_PLAYER;
+                default: return "ERROR";
+            }
+        }
+
+        boolean isClient(String player) {
+            return player.equals(CLIENT);
+        }
+
+        public int getCurrentPlayer() {
+            return currentPlayer;
+        }
+
+        boolean isClientTurn() {
+            /**
+             * @// TODO: 5-4-2016 remove
+             */
+            int clientNr = playerToInt(CLIENT);
+            if(clientNr==-1) {
+                throw new IllegalStateException("CLIENT NOT SET YET!");
+            }
+            return currentPlayer== clientNr;
+        }
+
+        void setClientStarts(boolean clientStarts) {
+            if(clientStarts) {
+                CLIENT = STARTING_PLAYER;
+                OPONENT = SECOND_PLAYER;
+            } else {
+                CLIENT = SECOND_PLAYER;
+                OPONENT = STARTING_PLAYER;
+            }
+        }
+    }
+
+
+
+
 
     public Game(int boardSize, String playerOne, String playerTwo) {
-        STARTING_PLAYER = playerOne;
-        SECOND_PLAYER = playerTwo;
+        players = new Players(playerOne, playerTwo);
         this.board = new Board(boardSize, this);
     }
 
     private void doMove(Point location) {
-
-        if (board.doMove(location, currentPlayer)) {
-            System.out.println("doMove player: "+currentPlayer+"did move "+location);
-            setSide = currentPlayer;
+        if (board.doMove(location, players.currentPlayer)) {
+            System.out.println("doMove player: " + players.currentPlayer + "did move " + location);
+            setSide = players.currentPlayer;
         } else {
+            System.out.println("doMove player: " + players.currentPlayer + "could not do move " + location);
             throw new IllegalStateException("False move. Not allowed.");
         }
     }
@@ -49,43 +114,34 @@ public class Game extends AbstractModel{
     }
 
     public int getScore(String player) {
-        return board.getOccurrences(playerToInt(player));
+        return board.getOccurrences(players.playerToInt(player));
     }
 
 
     public boolean isValidMove(Point location) {
-        return board.isValidMove(location, currentPlayer);
-    }
-
-    public boolean isClientsTurn() {
-        return currentPlayer==1;
+        return board.isValidMove(location, players.currentPlayer);
     }
 
     public void setClientBegins(boolean clientBegins) {
-        startingPlayer = (clientBegins)? 1: 2;
-        currentPlayer = startingPlayer;
+        players.setClientStarts(clientBegins);
         if(clientBegins) {
-            CLIENT = STARTING_PLAYER;
-            OPONENT = SECOND_PLAYER;
             System.out.println("Client should begin");
-            setClientTurn();
+            doClientTurn();
         } else {
-            OPONENT = STARTING_PLAYER;
-            CLIENT = SECOND_PLAYER;
             System.out.println("Oponent should begin");
-            setOponentTurn();
+            doOpponentTurn();
         }
     }
 
     @Override
     public int[] getValidSets() {
-        return Arrays.stream(board.getPossibleMoves(currentPlayer))
+        return Arrays.stream(board.getPossibleMoves(players.currentPlayer))
                 .mapToInt(this::pointToInt)
                 .toArray();
     }
 
-    private void setClientTurn() {
-        System.out.println("CLient can perform move");
+    private void doClientTurn() {
+        System.out.println("Client can perform move");
         fire(new ActionEvent(this, AbstractModel.TURN_START, "CLIENT IS ON SET"));
     }
 
@@ -103,20 +159,6 @@ public class Game extends AbstractModel{
 
     public void fire(ActionEvent event) {
         listeners.forEach(listener -> listener.actionPerformed(event));
-    }
-
-    private String playerToString(int playerNr) {
-        switch (playerNr) {
-            case 1: return CLIENT;
-            case 2: return OPONENT;
-            default: return "UNKNOWN";
-        }
-    }
-
-    private int playerToInt(String player) {
-        if(player.equals(CLIENT)) return 1;
-        if(player.equals(OPONENT)) return 2;
-        return -1;
     }
 
     /**
@@ -140,33 +182,32 @@ public class Game extends AbstractModel{
 
     public void endTurn() {
         System.out.println("turn ended");
-        currentPlayer = 3-currentPlayer;
-        if(board.getPossibleMoves(currentPlayer).length==0) {
-            System.out.println("No possible moves for " + currentPlayer);
-            currentPlayer = 3 - currentPlayer;
-            if (board.getPossibleMoves(currentPlayer).length == 0) {
+        players.togglePlayer();
+        if(board.getPossibleMoves(players.currentPlayer).length==0) {
+            System.out.println("No possible moves for " + players.currentPlayer);
+            players.togglePlayer();
+            if (board.getPossibleMoves(players.currentPlayer).length == 0) {
                 //game finished
             }
         }
-        if(currentPlayer==1) setClientTurn();
-        if(currentPlayer==2) setOponentTurn();
+        if(players.isClientTurn()) {
+            doClientTurn();
+        } else {
+            doOpponentTurn();
+        }
     }
 
-    private void setOponentTurn() {
+    private void doOpponentTurn() {
         System.out.println("It's the turn of the opponent");
-        currentPlayer = 2;
         fire(new ActionEvent(this, AbstractModel.TURN_END, "COMPUTER_TURN"));
     }
 
     public String getCurrentPlayer() {
-        return playerToString(currentPlayer);
+        return players.playerToString(players.currentPlayer);
     }
 
     public void prepareStandardGame() {
-        board.prepareStandardGame();
-        currentPlayer = (startingPlayer==0)? currentPlayer : startingPlayer;
-        fire(new ActionEvent(this, AbstractModel.TURN_START, "GAME STARTED"));
-
+        board.prepareStandardGame(clientStart);
     }
 
     public void piecePlaced(Point location, int player) {
