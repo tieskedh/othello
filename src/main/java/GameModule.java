@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 public class GameModule extends ClientAbstractGameModule implements ActionListener {
-    private static final int BOARD_SIZE = 8;
+    private static final int BOARD_SIZE = 4;
     private GameView gameView;
 
     private HashMap<String, Integer> playerResults = new HashMap<>();
@@ -73,7 +73,6 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
             throw new IllegalStateException("IT is not the turn of: "+player);
         }
 
-        System.out.println(game);
         System.out.println("Move carried out");
         game.doMove(Integer.parseInt(move));
 

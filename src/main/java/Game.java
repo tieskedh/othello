@@ -141,6 +141,7 @@ public class Game extends AbstractModel{
     }
 
     private void doClientTurn() {
+        System.out.println(this);
         System.out.println("Client can perform move");
         fire(new ActionEvent(this, AbstractModel.TURN_START, "CLIENT IS ON SET"));
     }
@@ -207,7 +208,9 @@ public class Game extends AbstractModel{
     }
 
     public void prepareStandardGame() {
-        board.prepareStandardGame(clientStart);
+        //@// TODO: 5-4-2016 change
+        board.prepareTestGame();
+//        board.prepareStandardGame(clientStart);
     }
 
     public void piecePlaced(Point location, int player) {
