@@ -89,6 +89,7 @@ public class GameView extends JPanel implements ActionListener{
                 int place = model.getSetLocation();
                 JButton button = buttons[place];
                 button.setText(players.getOrDefault(model.getSide(), ""));
+                button.setEnabled(false);
                 break;
                 default:
                     break;
