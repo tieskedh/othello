@@ -18,7 +18,7 @@ import java.util.stream.IntStream;
 public class GameView extends JPanel implements ActionListener{
 
     /** the representation for the players by their name*/
-    private final HashMap<Integer, String> players;
+    private final HashMap<Integer, Icon> players;
     /** the fields of the view*/
     private JButton[] buttons;
     private LinkedList<ActionListener> actionListeners = new LinkedList<>();
@@ -31,10 +31,10 @@ public class GameView extends JPanel implements ActionListener{
      * @param height the number of fields in the height
      * @param players the representation of the players by their id
      */
-    public GameView(int width, int height, Map<Integer, String> players) {
+    public GameView(int width, int height, HashMap<Integer, Icon> players) {
         super(new GridLayout(width, height, 10, 10));
         size = width*height;
-        this.players = new HashMap<>(players);
+        this.players = players;
         buttons = new JButton[width*height];
         IntStream.range(0, size)
                 .forEach(nr-> {
@@ -88,7 +88,8 @@ public class GameView extends JPanel implements ActionListener{
             case AbstractModel.PLACE_PIECE:
                 int place = model.getSetLocation();
                 JButton button = buttons[place];
-                button.setText(players.getOrDefault(model.getSide(), ""));
+                button.setIcon(players.getOrDefault(model.getSide(), null));
+                button.setDisabledIcon(players.getOrDefault(model.getSide(), null));
                 button.setEnabled(false);
                 break;
                 default:

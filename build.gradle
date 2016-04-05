@@ -13,7 +13,6 @@ repositories {
         dirs 'libs'
     }
 }
-
 dependencies {
 
     compile name: 'clientgamemodule-0.3'

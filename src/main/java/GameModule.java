@@ -2,9 +2,11 @@ import gui.GameView;
 import nl.abstractteam.gamemodule.ClientAbstractGameModule;
 import nl.abstractteam.gamemodule.MoveListener;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -29,7 +31,10 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
      */
     public GameModule(String playerOne, String playerTwo) {
         super(playerOne, playerTwo);
-        
+
+        ImageIcon red = new ImageIcon(getClass().getResource("red.png"));
+        ImageIcon blue = new ImageIcon(getClass().getResource("blue.png"));
+
         // TODO: 4-4-2016 remove
         System.out.println("GameModule.GameModule");
         System.out.println("playerOne = [" + playerOne + "], playerTwo = [" + playerTwo + "]");
@@ -37,14 +42,13 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
         
         game = new Game(BOARD_SIZE, playerOne, playerTwo);
 
-        HashMap<Integer, String> players = new HashMap<>();
-        players.put(1, "X");
-        players.put(2, "O");
+        HashMap<Integer, Icon> players = new HashMap<>();
+        players.put(1, blue);
+        players.put(2, red);
         gameView = new GameView(BOARD_SIZE, BOARD_SIZE, players);
         game.addActionListener(gameView);
         gameView.addActionListener(this);
     }
-
 
     @Override
     public Component getView() {
