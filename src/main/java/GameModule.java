@@ -38,8 +38,8 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
         game = new Game(BOARD_SIZE, playerOne, playerTwo);
 
         HashMap<Integer, String> players = new HashMap<>();
-        players.put(1, playerOne);
-        players.put(2, playerTwo);
+        players.put(1, "X");
+        players.put(2, "O");
         gameView = new GameView(BOARD_SIZE, BOARD_SIZE, players);
         game.addActionListener(gameView);
         gameView.addActionListener(this);
@@ -73,6 +73,7 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
             throw new IllegalStateException("IT is not the turn of: "+player);
         }
 
+        System.out.println(game);
         System.out.println("Move carried out");
         game.doMove(Integer.parseInt(move));
 

@@ -206,4 +206,16 @@ public class Board{
     }
 
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for(int x = 0; x < board.length; x++) {
+            for (int y = 0; y < board[0].length; y++) {
+                sb.append("\t");
+                sb.append(board[x][y]);
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
 }

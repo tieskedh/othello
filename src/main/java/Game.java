@@ -215,4 +215,9 @@ public class Game extends AbstractModel{
         setSide = player;
         fire(new ActionEvent(this, AbstractModel.PLACE_PIECE, "PIECE PLACED"));
     }
+
+    @Override
+    public String toString() {
+        return board.toString();
+    }
 }
