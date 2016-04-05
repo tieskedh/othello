@@ -209,8 +209,8 @@ public class Game extends AbstractModel{
 
     public void prepareStandardGame() {
         //@// TODO: 5-4-2016 change
-        board.prepareTestGame();
-//        board.prepareStandardGame(clientStart);
+//        board.prepareTestGame();
+        board.prepareStandardGame(clientStart);
     }
 
     public void piecePlaced(Point location, int player) {

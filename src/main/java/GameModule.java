@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 public class GameModule extends ClientAbstractGameModule implements ActionListener {
-    private static final int BOARD_SIZE = 4;
+    private static final int BOARD_SIZE = 8;
     private GameView gameView;
 
     private HashMap<String, Integer> playerResults = new HashMap<>();
