@@ -20,6 +20,8 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
     private LinkedList<MoveListener> moveListeners = new LinkedList<>();
 
     public static final String GAME_TYPE = "Reversi";
+    public static final String[] GAME_PIECES = new String[]{"White","Black"};
+
     public final Game game;
 
     /**
@@ -33,8 +35,8 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
     public GameModule(String playerOne, String playerTwo) {
         super(playerOne, playerTwo);
 
-        ImageIcon red = new ImageIcon(getClass().getResource("red.png"));
-        ImageIcon blue = new ImageIcon(getClass().getResource("blue.png"));
+        ImageIcon black = new ImageIcon(getClass().getResource("black.png"));
+        ImageIcon white = new ImageIcon(getClass().getResource("white.png"));
 
         // TODO: 4-4-2016 remove
         System.out.println("GameModule.GameModule");
@@ -44,8 +46,8 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
         game = new Game(BOARD_SIZE, playerOne, playerTwo);
 
         HashMap<Integer, Icon> players = new HashMap<>();
-        players.put(1, blue);
-        players.put(2, red);
+        players.put(1, black);
+        players.put(2, white);
         gameView = new GameView(BOARD_SIZE, BOARD_SIZE, players);
         game.addActionListener(gameView);
         gameView.addActionListener(this);
