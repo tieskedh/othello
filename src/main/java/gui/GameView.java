@@ -39,6 +39,8 @@ public class GameView extends JPanel implements ActionListener{
         IntStream.range(0, size)
                 .forEach(nr-> {
                     JButton button = new JButton();
+                    button.setFocusPainted(false);
+                    button.setBackground(Color.WHITE);
                     button.setEnabled(false);
                     button.addActionListener(this::buttonPressed);
                     buttons[nr] = button;

@@ -49,6 +49,7 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
         players.put(1, black);
         players.put(2, white);
         gameView = new GameView(BOARD_SIZE, BOARD_SIZE, players);
+        gameView.setBackground(Color.GREEN);
         game.addActionListener(gameView);
         gameView.addActionListener(this);
     }
