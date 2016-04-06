@@ -21,6 +21,7 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
 
     public static final String GAME_TYPE = "Reversi";
     public final Game game;
+
     /**
      * Mandatory constructor.
      * <p>
@@ -39,7 +40,7 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
         System.out.println("GameModule.GameModule");
         System.out.println("playerOne = [" + playerOne + "], playerTwo = [" + playerTwo + "]");
 
-        
+
         game = new Game(BOARD_SIZE, playerOne, playerTwo);
 
         HashMap<Integer, Icon> players = new HashMap<>();
@@ -56,8 +57,8 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
     }
 
     public void actionPerformed(ActionEvent e) {
-        System.out.println("action performed"+e.getID());
-        if(game.isClientsTurn()) {
+        System.out.println("action performed" + e.getID());
+        if (game.isClientsTurn()) {
             for (MoveListener moveListener : moveListeners) {
                 moveListener.movePerformed(String.valueOf(e.getID()));
             }
@@ -67,14 +68,14 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
 
     @Override
     public void doPlayerMove(String player, String move) throws IllegalStateException {
-        System.out.println("doPlayerMove: "+player+"wants to do move "+move);
+        System.out.println("doPlayerMove: " + player + "wants to do move " + move);
         // string in de vorm van 0-63 / 0-8,0-8 binnen
         if (matchStatus != MATCH_STARTED) {
             throw new IllegalStateException("Illegal match state");
         }
 
         if (!game.getCurrentPlayer().equals(player)) {
-            throw new IllegalStateException("IT is not the turn of: "+player);
+            throw new IllegalStateException("IT is not the turn of: " + player);
         }
 
         System.out.println("Move carried out");
@@ -97,6 +98,7 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
         if (matchStatus != MATCH_FINISHED) {
             throw new IllegalStateException("Illegal match state");
         }
+        System.out.println("server called getPlayerScore");
         return game.getScore(player);
     }
 
@@ -105,12 +107,13 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
         if (matchStatus != MATCH_FINISHED) {
             throw new IllegalStateException("Illegal match state");
         }
+        System.out.println("server called getMatchResultComment");
         return "The match has come to an end.";
     }
 
     @Override
     public int getMatchStatus() {
-        System.out.println("Match is over. This message was thrown from client.");
+        System.out.println("server called getMatchStatus");
         return matchStatus;
     }
 
@@ -131,7 +134,7 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
         if (matchStatus != MATCH_STARTED) {
             throw new IllegalStateException("Illegal match state");
         }
-        System.out.println(game.getCurrentPlayer()+" should do the next move");
+        System.out.println(game.getCurrentPlayer() + " should do the next move");
         return game.getCurrentPlayer();
     }
 
@@ -140,6 +143,7 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
         if (matchStatus != MATCH_FINISHED) {
             throw new IllegalStateException("Illegal match state");
         }
+        System.out.println("Server called getPlayerResult");
         return playerResults.get(player);
     }
 
@@ -148,7 +152,8 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
         if (matchStatus != MATCH_STARTED) {
             throw new IllegalStateException("Illegal match state");
         }
-        return (moveDetails == null)? "Place your piece." : moveDetails;
+        System.out.println("Server called getTurnMessage");
+        return (moveDetails == null) ? "Place your piece." : moveDetails;
     }
 
     @Override
@@ -171,6 +176,7 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
     private String otherPlayer(String player) {
         return player.equals(playerOne) ? playerTwo : playerOne;
     }
+
     public void addMoveListener(MoveListener movelistener) {
         moveListeners.add(movelistener);
     }
