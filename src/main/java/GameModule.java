@@ -110,6 +110,7 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
 
     @Override
     public int getMatchStatus() {
+        System.out.println("Match is over. This message was thrown from client.");
         return matchStatus;
     }
 
