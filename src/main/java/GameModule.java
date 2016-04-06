@@ -35,23 +35,12 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
     public GameModule(String playerOne, String playerTwo) {
         super(playerOne, playerTwo);
 
-        ImageIcon black = new ImageIcon(getClass().getResource("black.png"));
-        ImageIcon white = new ImageIcon(getClass().getResource("white.png"));
-
         // TODO: 4-4-2016 remove
         System.out.println("GameModule.GameModule");
         System.out.println("playerOne = [" + playerOne + "], playerTwo = [" + playerTwo + "]");
 
 
         game = new Game(BOARD_SIZE, playerOne, playerTwo);
-
-        HashMap<Integer, Icon> players = new HashMap<>();
-        players.put(1, black);
-        players.put(2, white);
-        gameView = new GameView(BOARD_SIZE, BOARD_SIZE, players);
-        gameView.setBackground(Color.GREEN);
-        game.addActionListener(gameView);
-        gameView.addActionListener(this);
     }
 
     @Override
@@ -162,6 +151,26 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
     @Override
     public void setClientBegins(boolean clientBegins) {
         game.setClientBegins(clientBegins);
+    }
+
+    @Override
+    public void setClientPlayPiece(String s) {
+        HashMap<Integer, Icon> players = new HashMap<>();
+
+        ImageIcon black = new ImageIcon(getClass().getResource("black.png"));
+        ImageIcon white = new ImageIcon(getClass().getResource("white.png"));
+
+        if (s.equals("black")) {
+            players.put(game.getClient(),   black);
+            players.put(game.getOpponent(), white);
+        } else {
+            players.put(game.getClient(),   white);
+            players.put(game.getOpponent(), black);
+        }
+
+        gameView = new GameView(BOARD_SIZE, BOARD_SIZE, players);
+        game.addActionListener(gameView);
+        gameView.addActionListener(this);
     }
 
     @Override // TODO: 4-4-2016 implement 

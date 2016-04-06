@@ -33,6 +33,7 @@ public class GameView extends JPanel implements ActionListener{
      */
     public GameView(int width, int height, HashMap<Integer, Icon> players) {
         super(new GridLayout(width, height, 10, 10));
+        setBackground(Color.BLACK);
         size = width*height;
         this.players = players;
         buttons = new JButton[width*height];
@@ -40,8 +41,7 @@ public class GameView extends JPanel implements ActionListener{
                 .forEach(nr-> {
                     JButton button = new JButton();
                     button.setFocusPainted(false);
-                    button.setBackground(Color.WHITE);
-                    button.setEnabled(false);
+                    setDisabled(button);
                     button.addActionListener(this::buttonPressed);
                     buttons[nr] = button;
                     add(button);
@@ -69,6 +69,15 @@ public class GameView extends JPanel implements ActionListener{
         actionListeners.add(listener);
     }
 
+    public void setDisabled(JButton button) {
+        button.setEnabled(false);
+        button.setBackground(new Color(0x37D622));
+    }
+
+    public void setEnabled(JButton button) {
+        button.setEnabled(true);
+        button.setBackground(new Color(0x99FF00));
+    }
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -78,21 +87,19 @@ public class GameView extends JPanel implements ActionListener{
             case AbstractModel.TURN_START:
                 int[] validSets = model.getValidSets();
                 Arrays.stream(validSets)
-                        .forEach(
-                                nr-> buttons[nr]
-                                        .setEnabled(true)
-                        );
+                        .mapToObj(nr->buttons[nr])
+                        .forEach(this::setEnabled);
                 break;
             case AbstractModel.TURN_END:
                 Arrays.stream(buttons)
-                        .forEach(button->button.setEnabled(false));
+                        .forEach(this::setDisabled);
                 break;
             case AbstractModel.PLACE_PIECE:
                 int place = model.getSetLocation();
                 JButton button = buttons[place];
                 button.setIcon(players.getOrDefault(model.getSide(), null));
                 button.setDisabledIcon(players.getOrDefault(model.getSide(), null));
-                button.setEnabled(false);
+                setDisabled(button);
                 break;
                 default:
                     break;

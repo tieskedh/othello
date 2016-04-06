@@ -17,9 +17,9 @@ public class Game extends AbstractModel{
     private LinkedList<ActionListener> listeners = new LinkedList<>();
     private boolean clientStart;
 
-    private Players players;
+    private Players playerState;
     public boolean isClientsTurn() {
-        return players.currentPlayer == players.playerToInt(players.CLIENT);
+        return playerState.currentPlayer == playerState.playerToInt(playerState.CLIENT);
     }
 
     private class Players {
@@ -90,16 +90,16 @@ public class Game extends AbstractModel{
 
 
     public Game(int boardSize, String playerOne, String playerTwo) {
-        players = new Players(playerOne, playerTwo);
+        playerState = new Players(playerOne, playerTwo);
         this.board = new Board(boardSize, this);
     }
 
     private void doMove(Point location) {
-        if (board.doMove(location, players.currentPlayer)) {
-            System.out.println("doMove player: " + players.currentPlayer + "did move " + location);
-            setSide = players.currentPlayer;
+        if (board.doMove(location, playerState.currentPlayer)) {
+            System.out.println("doMove player: " + playerState.currentPlayer + "did move " + location);
+            setSide = playerState.currentPlayer;
         } else {
-            System.out.println("doMove player: " + players.currentPlayer + "could not do move " + location);
+            System.out.println("doMove player: " + playerState.currentPlayer + "could not do move " + location);
             throw new IllegalStateException("False move. Not allowed.");
         }
     }
@@ -114,16 +114,16 @@ public class Game extends AbstractModel{
     }
 
     public int getScore(String player) {
-        return board.getOccurrences(players.playerToInt(player));
+        return board.getOccurrences(playerState.playerToInt(player));
     }
 
 
     public boolean isValidMove(Point location) {
-        return board.isValidMove(location, players.currentPlayer);
+        return board.isValidMove(location, playerState.currentPlayer);
     }
 
     public void setClientBegins(boolean clientBegins) {
-        players.setClientStarts(clientBegins);
+        playerState.setClientStarts(clientBegins);
         if(clientBegins) {
             System.out.println("Client should begin");
             doClientTurn();
@@ -135,7 +135,7 @@ public class Game extends AbstractModel{
 
     @Override
     public int[] getValidSets() {
-        return Arrays.stream(board.getPossibleMoves(players.currentPlayer))
+        return Arrays.stream(board.getPossibleMoves(playerState.currentPlayer))
                 .mapToInt(this::pointToInt)
                 .toArray();
     }
@@ -183,15 +183,15 @@ public class Game extends AbstractModel{
 
     public void endTurn() {
         System.out.println("turn ended");
-        players.togglePlayer();
-        if(board.getPossibleMoves(players.currentPlayer).length==0) {
-            System.out.println("No possible moves for " + players.currentPlayer);
-            players.togglePlayer();
-            if (board.getPossibleMoves(players.currentPlayer).length == 0) {
+        playerState.togglePlayer();
+        if(board.getPossibleMoves(playerState.currentPlayer).length==0) {
+            System.out.println("No possible moves for " + playerState.currentPlayer);
+            playerState.togglePlayer();
+            if (board.getPossibleMoves(playerState.currentPlayer).length == 0) {
                 //game finished
             }
         }
-        if(players.isClientTurn()) {
+        if(playerState.isClientTurn()) {
             doClientTurn();
         } else {
             doOpponentTurn();
@@ -204,7 +204,7 @@ public class Game extends AbstractModel{
     }
 
     public String getCurrentPlayer() {
-        return players.playerToString(players.currentPlayer);
+        return playerState.playerToString(playerState.currentPlayer);
     }
 
     public void prepareStandardGame() {
@@ -217,6 +217,14 @@ public class Game extends AbstractModel{
         setLocation = pointToInt(location);
         setSide = player;
         fire(new ActionEvent(this, AbstractModel.PLACE_PIECE, "PIECE PLACED"));
+    }
+
+    public int getClient() {
+        return playerState.playerToInt(playerState.CLIENT);
+    }
+
+    public int getOpponent() {
+        return playerState.playerToInt(playerState.OPONENT);
     }
 
     @Override
