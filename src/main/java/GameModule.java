@@ -20,7 +20,9 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
     private LinkedList<MoveListener> moveListeners = new LinkedList<>();
 
     public static final String GAME_TYPE = "Reversi";
-    public static final String[] GAME_PIECES = new String[]{"White","Black"};
+    private static final String BLACK = "Black";
+    private static final String WHITE = "White";
+    public static final String[] GAME_PIECES = new String[]{WHITE, BLACK};
 
     public final Game game;
 
@@ -82,6 +84,7 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
         } else {
             moveDetails = "Next";
             game.endTurn();
+            game.turnStart();
         }
     }
 
@@ -155,22 +158,27 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
 
     @Override
     public void setClientPlayPiece(String s) {
+        System.out.println(s);
+        System.out.println(game.getClient());
+        System.out.println(game.getOpponent());
         HashMap<Integer, Icon> players = new HashMap<>();
 
         ImageIcon black = new ImageIcon(getClass().getResource("black.png"));
         ImageIcon white = new ImageIcon(getClass().getResource("white.png"));
 
-        if (s.equals("black")) {
-            players.put(game.getClient(),   black);
+        if (s.equals(BLACK)) {
+            players.put(game.getClient(), black);
             players.put(game.getOpponent(), white);
         } else {
-            players.put(game.getClient(),   white);
+            players.put(game.getClient(), white);
             players.put(game.getOpponent(), black);
         }
-
+        System.out.println(players);
         gameView = new GameView(BOARD_SIZE, BOARD_SIZE, players);
         game.addActionListener(gameView);
         gameView.addActionListener(this);
+        game.prepareStandardGame();
+
     }
 
     @Override // TODO: 4-4-2016 implement 
@@ -180,9 +188,8 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
 
     @Override
     public void start() throws IllegalStateException {
-        game.prepareStandardGame();
-
         matchStatus = MATCH_STARTED;
+        game.turnStart();
     }
 
     private String otherPlayer(String player) {

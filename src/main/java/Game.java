@@ -191,6 +191,9 @@ public class Game extends AbstractModel{
                 //game finished
             }
         }
+    }
+
+    public void turnStart() {
         if(playerState.isClientTurn()) {
             doClientTurn();
         } else {
@@ -210,6 +213,7 @@ public class Game extends AbstractModel{
     public void prepareStandardGame() {
         //@// TODO: 5-4-2016 change
 //        board.prepareTestGame();
+        System.out.println("PREPARE GAME");
         board.prepareStandardGame(clientStart);
     }
 

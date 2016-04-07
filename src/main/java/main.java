@@ -7,7 +7,8 @@ import java.awt.*;
 public class main {
     public static void main(String[] args) {
         GameModule module = new GameModule("1","2");
-        module.setClientBegins(false);
+        module.setClientBegins(true);
+        module.setClientPlayPiece("White");
         module.start();
         JFrame frame = new JFrame("Othello");
         BorderLayout layout = new BorderLayout();
@@ -16,7 +17,7 @@ public class main {
         frame.add(module.getView(), BorderLayout.CENTER);
         frame.pack();
         frame.setVisible(true);
-        module.doPlayerMove("2", "37");
+        module.doPlayerMove("1", "37");
 
     }
 }
