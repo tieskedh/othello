@@ -1,3 +1,4 @@
+import gui.AbstractModel;
 import gui.GameView;
 import nl.abstractteam.gamemodule.ClientAbstractGameModule;
 import nl.abstractteam.gamemodule.MoveListener;
@@ -62,7 +63,11 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
 
     @Override
     public void doPlayerMove(String player, String move) throws IllegalStateException {
+        game.clearMoves();
         System.out.println("doPlayerMove: " + player + "wants to do move " + move);
+
+        game.fireEvents();
+
         // string in de vorm van 0-63 / 0-8,0-8 binnen
         if (matchStatus != MATCH_STARTED) {
             throw new IllegalStateException("Illegal match state");
@@ -74,6 +79,8 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
 
         System.out.println("Move carried out");
         game.doMove(Integer.parseInt(move));
+        game.fireEvents();
+
 
         if (game.checkIfMatchDone()) {
             matchStatus = MATCH_FINISHED;
@@ -151,16 +158,16 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
         return (moveDetails == null) ? "Place your piece." : moveDetails;
     }
 
+    // called 1st
     @Override
     public void setClientBegins(boolean clientBegins) {
+        System.out.println("setClientBeginsBEGINS!");
         game.setClientBegins(clientBegins);
     }
 
+    //called 2nd
     @Override
     public void setClientPlayPiece(String s) {
-        System.out.println(s);
-        System.out.println(game.getClient());
-        System.out.println(game.getOpponent());
         HashMap<Integer, Icon> players = new HashMap<>();
 
         ImageIcon black = new ImageIcon(getClass().getResource("black.png"));
@@ -173,12 +180,9 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
             players.put(game.getClient(), white);
             players.put(game.getOpponent(), black);
         }
-        System.out.println(players);
         gameView = new GameView(BOARD_SIZE, BOARD_SIZE, players);
         game.addActionListener(gameView);
         gameView.addActionListener(this);
-        game.prepareStandardGame();
-
     }
 
     @Override // TODO: 4-4-2016 implement 
@@ -186,10 +190,14 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
         return null;
     }
 
+    //called 3rd
     @Override
     public void start() throws IllegalStateException {
-        matchStatus = MATCH_STARTED;
+        game.prepareStandardGame();
+        System.out.println(game);
         game.turnStart();
+        matchStatus = MATCH_STARTED;
+
     }
 
     private String otherPlayer(String player) {
