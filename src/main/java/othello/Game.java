@@ -9,58 +9,108 @@ import java.util.Arrays;
 import java.util.LinkedList;
 
 /**
- * Created by thijs on 3-4-2016.
+ * The Game class is the primary part of the Model.
+ * This contains all the information and the manipulation methods for playing the game.
+ * It is extended from AbstractModel to give data to the GameView
  */
 public class Game extends AbstractModel {
+    //contains the actual board and pieces to track internally.
     private final Board board;
     private int setSide;
     private int setLocation;
 
+    // Temporary storage for all changes to the board.
     private ArrayList<Move> moves = new ArrayList<>();
 
+    private LinkedList<ActionListener> listeners = new LinkedList<>();
+    private boolean clientStarts;
+
+    // Contains the current state of the players
+    private Players playerState;
+
+    /**
+     * Constructor
+     *
+     * @param boardSize
+     * @param playerOne
+     * @param playerTwo
+     */
+    public Game(int boardSize, String playerOne, String playerTwo) {
+        playerState = new Players(playerOne, playerTwo);
+        this.board = new Board(boardSize, this);
+    }
+
+    /**
+     * Internal class Move.
+     * A Move object represents a single move from a player.
+     * Contains the player doing the move, and the location for that move.
+     */
     class Move {
         public final int player;
         public final int location;
 
+        /**
+         * Constructor for Move class
+         *
+         * @param player
+         * @param location
+         */
         public Move(int player, int location) {
             this.player = player;
             this.location = location;
         }
 
-        @Override
+        /**
+         * Converts data to String format for printing.
+         *
+         * @return
+         */
         public String toString() {
             return "player: " + player +
                     "Location" + location + "\n";
         }
     }
 
-    private LinkedList<ActionListener> listeners = new LinkedList<>();
-    private boolean clientStart;
 
-
-    private Players playerState;
-
-    public boolean isClientsTurn() {
-        return playerState.currentPlayer == playerState.playerToInt(playerState.CLIENT);
-    }
-
+    /**
+     * Internal class Players.
+     * Contains information about both players.
+     */
     private class Players {
+        //The player names
+        private String CLIENT;
+        private String OPPONENT;
+        //Which player goes first and which one second.
         private final String STARTING_PLAYER;
         private final String SECOND_PLAYER;
-        private String CLIENT;
-        private String OPONENT;
+        //Which player currently has the turn.
         private int currentPlayer = 1;
 
+        /**
+         * Constructor
+         *
+         * @param playerOne
+         * @param playerTwo
+         */
         public Players(String playerOne, String playerTwo) {
             STARTING_PLAYER = playerOne;
             SECOND_PLAYER = playerTwo;
         }
 
+        /**
+         * Switches which player is the current player.
+         */
         public void togglePlayer() {
             currentPlayer = 3 - currentPlayer;
         }
 
-        int playerToInt(String player) {
+        /**
+         * Converts player name to player number
+         *
+         * @param player
+         * @return
+         */
+        public int playerToInt(String player) {
             if (player.equals(STARTING_PLAYER)) {
                 return 1;
             } else if (player.equals(SECOND_PLAYER)) {
@@ -70,7 +120,10 @@ public class Game extends AbstractModel {
             }
         }
 
-        String playerToString(int nr) {
+        /**
+         * Converts player number to player name
+         */
+        public String playerToString(int nr) {
             switch (nr) {
                 case 1:
                     return STARTING_PLAYER;
@@ -81,7 +134,8 @@ public class Game extends AbstractModel {
             }
         }
 
-        boolean isClient(String player) {
+        //Checks if given player is the client
+        public boolean isClient(String player) {
             return player.equals(CLIENT);
         }
 
@@ -89,10 +143,11 @@ public class Game extends AbstractModel {
             return currentPlayer;
         }
 
-        boolean isClientTurn() {
-            /**
-             * @// TODO: 5-4-2016 remove
-             */
+        /**
+         * Checks if client is current player
+         */
+        private boolean isClientTurn() {
+
             int clientNr = playerToInt(CLIENT);
             if (clientNr == -1) {
                 throw new IllegalStateException("CLIENT NOT SET YET!");
@@ -100,26 +155,34 @@ public class Game extends AbstractModel {
             return currentPlayer == clientNr;
         }
 
+
+        /**
+         * Sets whether the Client goes first or second
+         *
+         * @param clientStarts
+         */
         void setClientStarts(boolean clientStarts) {
             if (clientStarts) {
                 CLIENT = STARTING_PLAYER;
-                OPONENT = SECOND_PLAYER;
+                OPPONENT = SECOND_PLAYER;
             } else {
                 CLIENT = SECOND_PLAYER;
-                OPONENT = STARTING_PLAYER;
+                OPPONENT = STARTING_PLAYER;
             }
         }
     }
 
 
-    public Game(int boardSize, String playerOne, String playerTwo) {
-        playerState = new Players(playerOne, playerTwo);
-        this.board = new Board(boardSize, this);
-    }
-
-    private void doMove(Point location) {
-    	System.out.println("Othello doMove -> current player = " + playerState.currentPlayer);
-    	System.out.println("Othello doMove -> my turn  = " + isClientsTurn());
+    /**
+     * Executes a move to the given Point on the Board
+     * Checks for validity move.
+     *
+     * @param location
+     * @throws IllegalStateException
+     */
+    private void doMove(Point location) throws IllegalStateException {
+        System.out.println("Othello doMove -> current player = " + playerState.currentPlayer);
+        System.out.println("Othello doMove -> my turn  = " + isClientsTurn());
         if (board.doMove(location, playerState.currentPlayer)) {
             System.out.println("doMove player: " + playerState.currentPlayer + "did move " + location);
             setSide = playerState.currentPlayer;
@@ -129,24 +192,31 @@ public class Game extends AbstractModel {
         }
     }
 
+    /**
+     * Additive to doMove(Point location)
+     * Transforms Board location from integer (0-BOARD_LENGTH^2) to Point(x,y)
+     *
+     * @param location
+     */
     public void doMove(int location) {
-        Point locationPoint = intToPoint(location);
-        doMove(locationPoint);
+        doMove(intToPoint(location));
     }
 
-    public boolean checkIfMatchDone() {
-        return (board.getPossibleMoves(1).length == 0 && board.getPossibleMoves(2).length == 0);
-    }
-
-    public int getScore(String player) {
-        return board.getOccurrences(playerState.playerToInt(player));
-    }
-
-
+    /**
+     * Checks if move is valid.
+     *
+     * @param location
+     * @return
+     */
     public boolean isValidMove(Point location) {
         return board.isValidMove(location, playerState.currentPlayer);
     }
 
+    /**
+     * Sets if the Client has the first turn, then prepares it.
+     *
+     * @param clientBegins
+     */
     public void setClientBegins(boolean clientBegins) {
         playerState.setClientStarts(clientBegins);
         if (clientBegins) {
@@ -158,40 +228,79 @@ public class Game extends AbstractModel {
         }
     }
 
-    @Override
-    public int[] getValidSets() {
-        return Arrays.stream(board.getPossibleMoves(playerState.currentPlayer))
-                .mapToInt(this::pointToInt)
-                .toArray();
+
+    public boolean isClientsTurn() {
+        return playerState.isClientTurn();
     }
 
+    /**
+     * Enables buttons for Client
+     */
     private void doClientTurn() {
         System.out.println("Client can perform move");
         fire(new ActionEvent(this, AbstractModel.TURN_START, "CLIENT IS ON SET"));
     }
 
-    @Override
-    public int getSetLocation() {
-        return setLocation;
+    /**
+     * Only informs Client that Opponent has the turn, as no further action is needed.
+     */
+    private void doOpponentTurn() {
+        System.out.println("It's the turn of the opponent");
     }
 
-    @Override
-    public int getSide() {
-        return setSide;
-    }
-
+    /**
+     * adds ActionListener to the list.
+     *
+     * @param listener
+     */
     public void addActionListener(ActionListener listener) {
         listeners.add(listener);
         int[][] test = new int[3][3];
         System.out.println(test);
     }
 
+    /**
+     * Fires event to all subscribed listeners.
+     *
+     * @param event
+     */
     public void fire(ActionEvent event) {
         listeners.forEach(listener -> listener.actionPerformed(event));
     }
 
     /**
-     * Converts the location from a {@code int} into a point
+     * Adds changed added or flipped pieces to list to be processed.
+     *
+     * @param location
+     * @param player
+     */
+    public void piecePlaced(Point location, int player) {
+        moves.add(new Move(player, pointToInt(location)));
+    }
+
+    /**
+     * Executes all changes to the Board.
+     */
+    public void fireEvents() {
+        Arrays.stream(clearMoves())
+                .peek(move -> setSide = move.player)
+                .peek(move -> setLocation = move.location)
+                .forEach(move -> fire(new ActionEvent(this, AbstractModel.PLACE_PIECE, "Place Piece")));
+    }
+
+    /**
+     * clears out and returns list of changes to the Board.
+     *
+     * @return
+     */
+    public Move[] clearMoves() {
+        Move[] moveList = moves.toArray(new Move[0]);
+        moves.clear();
+        return moveList;
+    }
+
+    /**
+     * Converts the location from an Integer into a Point(x,y)
      *
      * @param location the location to convert
      * @return the converted location
@@ -201,7 +310,7 @@ public class Game extends AbstractModel {
     }
 
     /**
-     * Converts the location from a {@code Point} into an int
+     * Converts the location from a Point(x,y) into an Integer
      *
      * @param point the location to convert
      * @return the converted location
@@ -210,19 +319,27 @@ public class Game extends AbstractModel {
         return point.x * board.getSize() + point.y;
     }
 
-
+    /**
+     * Ends the player's turn
+     */
     public void endTurn() {
+        //changes current player
         playerState.togglePlayer();
+        //Checks for end of the game
         if (board.getPossibleMoves(playerState.currentPlayer).length == 0) {
             playerState.togglePlayer();
             if (board.getPossibleMoves(playerState.currentPlayer).length == 0) {
                 //game finished
             }
         }
+        //Informs Views
         fire(new ActionEvent(this, AbstractModel.TURN_END, "COMPUTER_TURN"));
 
     }
 
+    /**
+     * Starts the next turn
+     */
     public void turnStart() {
         if (playerState.isClientTurn()) {
             doClientTurn();
@@ -231,56 +348,113 @@ public class Game extends AbstractModel {
         }
     }
 
-    private void doOpponentTurn() {
-        System.out.println("It's the turn of the opponent");
+    /**
+     * Sets the Board up for a standarized games
+     */
+    public void prepareStandardGame() {
+        System.out.println("PREPARE GAME");
+        board.prepareStandardGame(clientStarts);
+        //informs the View of the new pieces
+        fireEvents();
     }
 
+    /**
+     * returns all valid moves at this point for the current player
+     * Inherited from AbstractModel
+     *
+     * @return Array with all valid locations
+     */
+    @Override
+    public int[] getValidSets() {
+        return Arrays.stream(board.getPossibleMoves(playerState.currentPlayer))
+                .mapToInt(this::pointToInt)
+                .toArray();
+    }
+
+    /**
+     * returns the location where the most recent piece is placed.
+     * Inherited from AbstractModel
+     *
+     * @return
+     */
+    @Override
+    public int getSetLocation() {
+        return setLocation;
+    }
+
+    /**
+     * Returns the player who did the most recent move.
+     * Inherited from AbstractModel
+     *
+     * @return
+     */
+    @Override
+    public int getSide() {
+        return setSide;
+    }
+
+    /**
+     * Checks for the end of the match
+     *
+     * @return
+     */
+    public boolean checkIfMatchDone() {
+        return (board.getPossibleMoves(1).length == 0 && board.getPossibleMoves(2).length == 0);
+    }
+
+    /**
+     * Returns the given players score
+     *
+     * @param player
+     * @return
+     */
+    public int getScore(String player) {
+        return board.getOccurrences(playerState.playerToInt(player));
+    }
+
+    /**
+     * Returns the current player
+     *
+     * @return
+     */
     public String getCurrentPlayer() {
         return playerState.playerToString(playerState.currentPlayer);
     }
 
-    public void prepareStandardGame() {
-        //@// TODO: 5-4-2016 change
-//        board.prepareTestGame();
-        System.out.println("PREPARE GAME");
-        board.prepareStandardGame(clientStart);
-        fireEvents();
-    }
-
-    public void piecePlaced(Point location, int player) {
-        moves.add(new Move(player, pointToInt(location)));
-    }
-
-    public void fireEvents() {
-        System.out.println(moves);
-
-        Arrays.stream(clearMoves())
-                .peek(move -> setSide = move.player)
-                .peek(move -> setLocation = move.location)
-                .forEach(move -> fire(new ActionEvent(this, AbstractModel.PLACE_PIECE, "Place Piece")));
-    }
-
-    public Move[] clearMoves() {
-        Move[] moveList = moves.toArray(new Move[0]);
-        moves.clear();
-        return moveList;
-    }
-
-
+    /**
+     * returns the Client player
+     *
+     * @return
+     */
     public int getClient() {
         return playerState.playerToInt(playerState.CLIENT);
     }
 
+    /**
+     * returns the opposing player
+     *
+     * @return
+     */
     public int getOpponent() {
-        return playerState.playerToInt(playerState.OPONENT);
+        return playerState.playerToInt(playerState.OPPONENT);
     }
 
+    /**
+     * Returns the Board in string form
+     *
+     * @return
+     */
     @Override
     public String toString() {
         return board.toString();
     }
-    
+
+    /**
+     * Returns the Board.
+     *
+     * @return
+     */
     public Board getBoard() {
-    	return this.board;
+        return this.board;
     }
 }

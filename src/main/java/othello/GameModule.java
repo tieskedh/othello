@@ -1,6 +1,7 @@
 package othello;
-import othello.gui.*;
 
+import othello.gui.AbstractModel;
+import othello.gui.GameView;
 import nl.abstractteam.gamemodule.ClientAbstractGameModule;
 import nl.abstractteam.gamemodule.MoveListener;
 
@@ -14,7 +15,7 @@ import java.util.LinkedList;
 
 public class GameModule extends ClientAbstractGameModule implements ActionListener {
     private static final int BOARD_SIZE = 8;
-    private GameView gameView=null;
+    private GameView gameView;
 
     private HashMap<String, Integer> playerResults = new HashMap<>();
     private String moveDetails;
@@ -39,11 +40,11 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
     public GameModule(String playerOne, String playerTwo) {
         super(playerOne, playerTwo);
 
-        game = new Game(BOARD_SIZE, playerOne, playerTwo);
+        // TODO: 4-4-2016 remove
+        System.out.println("GameModule.GameModule");
+        System.out.println("playerOne = [" + playerOne + "], playerTwo = [" + playerTwo + "]");
 
-        gameView = new GameView(BOARD_SIZE, BOARD_SIZE);
-        game.addActionListener(gameView);
-        gameView.addActionListener(this);
+        game = new Game(BOARD_SIZE, playerOne, playerTwo);
     }
 
     @Override
@@ -51,6 +52,12 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
         return gameView;
     }
 
+    /**
+     * Sends action to all MoveListeners.
+     * currently contains only the Framework.
+     *
+     * @param e
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         System.out.println("action performed" + e.getID());
@@ -82,6 +89,7 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
         game.doMove(Integer.parseInt(move));
         game.fireEvents();
 
+        //Checks and handles the end of the match.
         if (game.checkIfMatchDone()) {
             matchStatus = MATCH_FINISHED;
             moveDetails = "Done";
@@ -184,23 +192,31 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
         gameView.setPlayers(players);
     }
 
-    @Override // TODO: 4-4-2016 implement 
+
+    /**
+     * Contains the logic for the AI players.
+     * If the Client is set as an AI, the Framework will use this method to acquire its move, instead of using a View Event
+     * Inherited from ClientAbstractGameModule.
+     *
+     * @return
+     */
+    @Override // TODO: 4-4-2016 implement
     public String getAIMove() {
-    	System.out.println("Othello AI -> I'm asked to do a move");
-    	Board board = game.getBoard();
-    	
-    	int[][] boardPieces = Arrays.copyOf(board.getBoardPieces(), board.getBoardPieces().length);
-    	
-    	int[][] newBoardPieces = new int[8][8];
-    	for (int i = 0; i < boardPieces.length; i++) {
+        System.out.println("Othello AI -> I'm asked to do a move");
+        Board board = game.getBoard();
+
+        int[][] boardPieces = Arrays.copyOf(board.getBoardPieces(), board.getBoardPieces().length);
+
+        int[][] newBoardPieces = new int[8][8];
+        for (int i = 0; i < boardPieces.length; i++) {
             System.arraycopy(boardPieces[i], 0, newBoardPieces[i], 0, boardPieces[i].length);
-    	}
-    	
-    	int[] possibleMoves = game.getValidSets();
-    	
-    	int score = Integer.MIN_VALUE;
+        }
+
+        int[] possibleMoves = game.getValidSets();
+
+        int score = Integer.MIN_VALUE;
         int tempScore;
-    	int move = -1;
+        int move = -1;
         for (int possibleMove : possibleMoves) {
             board.doMove(game.intToPoint(possibleMove), game.getClient());
             tempScore = board.getOccurrences(game.getClient());
@@ -210,11 +226,11 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
             }
             board.setBoardPieces(newBoardPieces);
         }
-    	
-    	if(move == -1){
-    		return null;
-    	}
-    	return "" + move;
+
+        if (move == -1) {
+            return null;
+        }
+        return "" + move;
     }
 
     //called 3rd

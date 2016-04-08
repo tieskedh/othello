@@ -14,11 +14,15 @@ import java.util.stream.IntStream;
  * The othello.gui for tictactoe
  * Created by Thijs de Haan on 24-3-2016.
  */
-public class GameView extends JPanel implements ActionListener{
+public class GameView extends JPanel implements ActionListener {
 
-    /** the representation for the players by their name*/
+    /**
+     * the representation for the players by their name
+     */
     private HashMap<Integer, Icon> players;
-    /** the fields of the view*/
+    /**
+     * the fields of the view
+     */
     private JButton[] buttons;
     private LinkedList<ActionListener> actionListeners = new LinkedList<>();
     private int size;
@@ -35,7 +39,7 @@ public class GameView extends JPanel implements ActionListener{
         size = width*height;
         buttons = new JButton[width*height];
         IntStream.range(0, size)
-                .forEach(nr-> {
+                .forEach(nr -> {
                     JButton button = new JButton();
                     button.setFocusPainted(false);
                     setDisabled(button);
@@ -52,6 +56,7 @@ public class GameView extends JPanel implements ActionListener{
 
     /**
      * Action to perform when a button is pressed
+     *
      * @param actionEvent the event which occurred
      */
     private void buttonPressed(ActionEvent actionEvent) {

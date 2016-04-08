@@ -4,11 +4,11 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * Created by Gebruiker on 30/03/2016.
+ * Main class. Only used for testing ATM, as this program is otherwise launched through the framework.
  */
 public class main {
     public static void main(String[] args) {
-        GameModule module = new GameModule("1","2");
+        GameModule module = new GameModule("1", "2");
         module.setClientBegins(true);
         module.setClientPlayPiece("White");
         module.start();
