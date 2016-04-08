@@ -45,6 +45,10 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
         System.out.println("playerOne = [" + playerOne + "], playerTwo = [" + playerTwo + "]");
 
         game = new Game(BOARD_SIZE, playerOne, playerTwo);
+
+        gameView = new GameView(BOARD_SIZE, BOARD_SIZE);
+        game.addActionListener(gameView);
+        gameView.addActionListener(this);
     }
 
     @Override
