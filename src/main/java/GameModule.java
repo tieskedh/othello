@@ -41,10 +41,6 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
 	public GameModule(String playerOne, String playerTwo) {
 		super(playerOne, playerTwo);
 
-		// TODO: 4-4-2016 remove
-		System.out.println("GameModule.GameModule");
-		System.out.println("playerOne = [" + playerOne + "], playerTwo = [" + playerTwo + "]");
-
 		game = new Game(BOARD_SIZE, playerOne, playerTwo);
 	}
 
@@ -54,19 +50,16 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
 	}
 
 	public void actionPerformed(ActionEvent e) {
-		System.out.println("action performed" + e.getID());
 		if (game.isClientsTurn()) {
 			for (MoveListener moveListener : moveListeners) {
 				moveListener.movePerformed(String.valueOf(e.getID()));
 			}
-			System.out.println("Move carried out");
 		}
 	}
 
 	@Override
 	public void doPlayerMove(String player, String move) throws IllegalStateException {
 		game.clearMoves();
-		System.out.println("doPlayerMove: " + player + "wants to do move " + move);
 
 		game.fireEvents();
 
@@ -79,7 +72,6 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
 			throw new IllegalStateException("IT is not the turn of: " + player);
 		}
 
-		System.out.println("Move carried out");
 		game.doMove(Integer.parseInt(move));
 		game.fireEvents();
 
@@ -88,7 +80,6 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
 			moveDetails = "Done";
 			playerResults.put(player, PLAYER_WIN);
 			playerResults.put(otherPlayer(player), PLAYER_LOSS);
-			System.out.println("MATCH IS OVER");
 		} else {
 			moveDetails = "Next";
 			game.endTurn();
@@ -101,7 +92,6 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
 		if (matchStatus != MATCH_FINISHED) {
 			throw new IllegalStateException("Illegal match state");
 		}
-		System.out.println("server called getPlayerScore");
 		return game.getScore(player);
 	}
 
@@ -110,13 +100,11 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
 		if (matchStatus != MATCH_FINISHED) {
 			throw new IllegalStateException("Illegal match state");
 		}
-		System.out.println("server called getMatchResultComment");
 		return "The match has come to an end.";
 	}
 
 	@Override
 	public int getMatchStatus() {
-		System.out.println("server called getMatchStatus" + matchStatus);
 		return matchStatus;
 	}
 
@@ -137,7 +125,6 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
 		if (matchStatus != MATCH_STARTED) {
 			throw new IllegalStateException("Illegal match state");
 		}
-		System.out.println(game.getCurrentPlayer() + " should do the next move");
 		return game.getCurrentPlayer();
 	}
 
@@ -146,7 +133,6 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
 		if (matchStatus != MATCH_FINISHED) {
 			throw new IllegalStateException("Illegal match state");
 		}
-		System.out.println("Server called getPlayerResult");
 		return playerResults.get(player);
 	}
 
@@ -155,14 +141,12 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
 		if (matchStatus != MATCH_STARTED) {
 			throw new IllegalStateException("Illegal match state");
 		}
-		System.out.println("Server called getTurnMessage");
 		return (moveDetails == null) ? "Place your piece." : moveDetails;
 	}
 
 	// called 1st
 	@Override
 	public void setClientBegins(boolean clientBegins) {
-		System.out.println("setClientBeginsBEGINS!");
 		game.setClientBegins(clientBegins);
 	}
 
@@ -188,89 +172,73 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
 
 	@Override // TODO: 4-4-2016 implement
 	public String getAIMove() {
-		System.out.println("Othello AI -> I'm asked to do a move");
 		Board board = game.getBoard();
+		int move;
 
-		System.out.println(board.getBoardPieces());
-		int[][] boardPieces = Arrays.copyOf(board.getBoardPieces(), board.getBoardPieces().length);
-
-		int[][] newBoardPieces = new int[8][8];
-		for (int i = 0; i < boardPieces.length; i++) {
-			for (int j = 0; j < boardPieces[i].length; j++) {
-				newBoardPieces[i][j] = boardPieces[i][j];
-			}
-		}
-
-		int[] possibleMoves = game.getValidSets();
-
-		int score = 0;
-		Best move;
-
-		/*
-		 * Greedy for(int i = 0; i < possibleMoves.length; i++) {
-		 * board.doMove(game.intToPoint(possibleMoves[i]), game.getClient());
-		 * if(board.getOccurrences(game.getClient()) > score) { score =
-		 * board.getOccurrences(game.getClient()); move = possibleMoves[i]; }
-		 * board.setBoardPieces(newBoardPieces); }
-		 */
-
-		move = getBestMiniMaxMove(board, 0);
-
-		if (move.move == -1) {
+		move = getBestMiniMaxMove(board, 0, game.getClient(), game.getOpponent(), game.getClient())[1];
+		game.getClient();
+		if (move == -1) {
 			return null;
 		}
-		return "" + move.move;
+		
+		System.out.println("AI decides the move needs to be: " + move);
+		return "" + move;
 	}
 
-	private Best getBestMiniMaxMove(Board board, int depth) {
-		Best reply = null;
-		if (depth < 5) {
-			Best temporaryBest;
-			int score = -1;
+	private int[] getBestMiniMaxMove(Board board, int depth, int client, int opponent, int turn) {
+		int currentScore;
+		int bestScore = (turn == client) ? Integer.MIN_VALUE : Integer.MAX_VALUE;
+		int bestMove = -1;
+		
+		int[] possibleMoves = game.getValidSets();
+		
+		if (depth < 5 && possibleMoves.length > 0) {			
 			int[][] boardPieces = board.getBoardPieces();
-
-			int[][] newBoardPieces = new int[8][8];
+			int[][] oldBoardPieces = new int[8][8];
 			for (int i = 0; i < boardPieces.length; i++) {
 				for (int j = 0; j < boardPieces[i].length; j++) {
-					newBoardPieces[i][j] = boardPieces[i][j];
+					oldBoardPieces[i][j] = boardPieces[i][j];
 				}
 			}
 
-			int[] possibleMoves = game.getValidSets();
-			for (int i = 0; i < possibleMoves.length; i++) {
-				temporaryBest = getBestMiniMaxMove(board, (depth +1));
-				temporaryBest.move = possibleMoves[i];
-				
-				if (reply == null) {
-					reply = temporaryBest;
-				} else if (game.isClientsTurn()) {
-					board.doMove(game.intToPoint(possibleMoves[i]), game.getClient());
-					temporaryBest.value = board.getOccurrences(game.getClient());
-					if (reply.value < temporaryBest.value){
-						reply = temporaryBest;
+			for (int currentMove : possibleMoves) {
+				board.doMoveInternal(game.intToPoint(currentMove), turn);
+				if (turn == client) {
+					currentScore = getBestMiniMaxMove(board, (depth + 1), client, opponent, switchSide(turn, client, opponent))[0];
+					if (currentScore > bestScore){
+						bestMove = currentMove;
+						bestScore = currentScore;
 					}
 				} else {
-					board.doMove(game.intToPoint(possibleMoves[i]), game.getOpponent());
-					temporaryBest.value = board.getOccurrences(game.getClient());
-					if (reply.value < temporaryBest.value){
-						reply = temporaryBest;
+					currentScore = getBestMiniMaxMove(board, (depth + 1), client, opponent, switchSide(turn, client, opponent))[0];
+					if (currentScore > bestScore){
+						bestMove = currentMove;
+						bestScore = currentScore;
 					}
 				}
 
-				board.setBoardPieces(newBoardPieces);
+				board.setBoardPieces(oldBoardPieces);
 			}
 		} else {
-			return new Best(0);
+			if(depth % 2 > 0)
+				return new int[] {board.getOccurrences(opponent), bestMove};
+			return new int[] {board.getOccurrences(client), bestMove};
 		}
 
-		return reply;
+		return new int[] {bestScore, bestMove};
+	}
+	
+	private int switchSide(int turn, int client, int opponent){
+		if(turn != client){
+			return client;
+		}
+		return opponent;
 	}
 
 	// called 3rd
 	@Override
 	public void start() throws IllegalStateException {
 		game.prepareStandardGame();
-		System.out.println(game);
 		game.turnStart();
 		matchStatus = MATCH_STARTED;
 

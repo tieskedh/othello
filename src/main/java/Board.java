@@ -65,7 +65,7 @@ public class Board {
      * @param player   the player which places the move
      * @see #doMove(Point, int)
      */
-    private void doMoveInternal(Point location, int player) {
+    void doMoveInternal(Point location, int player) {
         setAtLocation(location, player);
         IntStream.range(0, 9)
                 .mapToObj(nr -> checkLinePieces(location, nr / 3 - 1, nr % 3 - 1, player, new ArrayList<>()))
