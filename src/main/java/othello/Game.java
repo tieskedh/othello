@@ -1,4 +1,5 @@
 package othello;
+
 import othello.gui.*;
 
 import java.awt.*;
@@ -23,7 +24,6 @@ public class Game extends AbstractModel {
     private ArrayList<Move> moves = new ArrayList<>();
 
     private LinkedList<ActionListener> listeners = new LinkedList<>();
-    private boolean clientStarts;
 
     // Contains the current state of the players
     private Players playerState;
@@ -353,7 +353,7 @@ public class Game extends AbstractModel {
      */
     public void prepareStandardGame() {
         System.out.println("PREPARE GAME");
-        board.prepareStandardGame(clientStarts);
+        board.prepareStandardGame();
         //informs the View of the new pieces
         fireEvents();
     }

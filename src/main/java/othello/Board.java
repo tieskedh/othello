@@ -19,11 +19,11 @@ public class Board {
      */
     private static final int PLAYER_1 = 1;
     /**
-     * represents a space with the piece of the enemy
+     * represents a space with the piece of the opposing player
      */
     private static final int PLAYER_2 = 2;
     /**
-     * represents the size of a side of the board
+     * The size of a side of the board
      */
     private final int BOARD_SIZE;
     private int board[][];
@@ -100,6 +100,7 @@ public class Board {
         board[location.x][location.y] = player;
         game.piecePlaced(location, player);
     }
+
     /**
      * Flips the side of a piece.
      * If no Piece is placed, keeps the field untouched
@@ -134,7 +135,7 @@ public class Board {
     /**
      * Prepares a standard 8 by 8 game.
      */
-    public void prepareStandardGame(boolean clientBegins) {
+    public void prepareStandardGame() {
         clear();
         setAtLocation(new Point(3, 3), PLAYER_2);
         setAtLocation(new Point(4, 3), PLAYER_1);
@@ -221,7 +222,7 @@ public class Board {
      */
     public boolean isValidMove(Point location, int player) {
         if (getAtLocation(location) != 0) {
-        	return false;
+            return false;
         }
         return !IntStream.range(0, 9)
                 .mapToObj(nr -> checkLinePieces(location, nr / 3 - 1, nr % 3 - 1, player, new ArrayList<>()))
@@ -245,20 +246,25 @@ public class Board {
         }
         return sb.toString();
     }
-    
+
+    /**
+     * Sets up the board for the AI player
+     *
+     * @param boardPieces
+     */
     public void setBoardPieces(int[][] boardPieces) {
-    	System.out.println(this);
-    	int[][] newBoardPieces = new int[8][8];
-    	for (int i = 0; i < boardPieces.length; i++) {
-    		for (int j = 0; j < boardPieces[i].length; j++) {
-    			newBoardPieces[i][j] = boardPieces[i][j];
-    		}
-    	}
-    	this.board = Arrays.copyOf(newBoardPieces, newBoardPieces.length);
-    	System.out.println(this);
+        System.out.println(this);
+        int[][] newBoardPieces = new int[8][8];
+        for (int i = 0; i < boardPieces.length; i++) {
+            for (int j = 0; j < boardPieces[i].length; j++) {
+                newBoardPieces[i][j] = boardPieces[i][j];
+            }
+        }
+        this.board = Arrays.copyOf(newBoardPieces, newBoardPieces.length);
+        System.out.println(this);
     }
-    
+
     public int[][] getBoardPieces() {
-    	return this.board;
+        return this.board;
     }
 }
