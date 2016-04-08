@@ -117,6 +117,8 @@ public class Game extends AbstractModel {
     }
 
     private void doMove(Point location) {
+    	System.out.println("Othello doMove -> current player = " + playerState.currentPlayer);
+    	System.out.println("Othello doMove -> my turn  = " + isClientsTurn());
         if (board.doMove(location, playerState.currentPlayer)) {
             System.out.println("doMove player: " + playerState.currentPlayer + "did move " + location);
             setSide = playerState.currentPlayer;
@@ -163,7 +165,6 @@ public class Game extends AbstractModel {
     }
 
     private void doClientTurn() {
-        System.out.println(this);
         System.out.println("Client can perform move");
         fire(new ActionEvent(this, AbstractModel.TURN_START, "CLIENT IS ON SET"));
     }
@@ -208,10 +209,8 @@ public class Game extends AbstractModel {
 
 
     public void endTurn() {
-        System.out.println("turn ended");
         playerState.togglePlayer();
         if (board.getPossibleMoves(playerState.currentPlayer).length == 0) {
-            System.out.println("No possible moves for " + playerState.currentPlayer);
             playerState.togglePlayer();
             if (board.getPossibleMoves(playerState.currentPlayer).length == 0) {
                 //game finished

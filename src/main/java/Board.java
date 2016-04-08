@@ -202,7 +202,6 @@ public class Board {
                 .mapToObj(nr -> new Point(nr / BOARD_SIZE, nr % BOARD_SIZE))
                 .filter(location -> isValidMove(location, player))
                 .toArray(Point[]::new);
-        System.out.println(Arrays.toString(test));
         return test;
     }
 
@@ -216,9 +215,10 @@ public class Board {
      * @see #doMove(Point, int)
      */
     public boolean isValidMove(Point location, int player) {
-        if (getAtLocation(location) != 0) return false;
+        if (getAtLocation(location) != 0) {
+        	return false;
+        }
         return !IntStream.range(0, 9)
-                .peek(nr-> System.out.println("["+(nr / 3 - 1)+"]["+(nr % 3 - 1)+"]"))
                 .mapToObj(nr -> checkLinePieces(location, nr / 3 - 1, nr % 3 - 1, player, new ArrayList<>()))
                 .allMatch(ArrayList::isEmpty);
     }
@@ -242,7 +242,15 @@ public class Board {
     }
     
     public void setBoardPieces(int[][] boardPieces) {
-    	this.board = boardPieces;
+    	System.out.println(this);
+    	int[][] newBoardPieces = new int[8][8];
+    	for (int i = 0; i < boardPieces.length; i++) {
+    		for (int j = 0; j < boardPieces[i].length; j++) {
+    			newBoardPieces[i][j] = boardPieces[i][j];
+    		}
+    	}
+    	this.board = Arrays.copyOf(newBoardPieces, newBoardPieces.length);
+    	System.out.println(this);
     }
     
     public int[][] getBoardPieces() {
