@@ -1,4 +1,4 @@
-package gui;
+package othello.gui;
 
 
 import javax.swing.*;
@@ -8,17 +8,16 @@ import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.stream.IntStream;
 
 /**
- * The gui for tictactoe
+ * The othello.gui for tictactoe
  * Created by Thijs de Haan on 24-3-2016.
  */
 public class GameView extends JPanel implements ActionListener{
 
     /** the representation for the players by their name*/
-    private final HashMap<Integer, Icon> players;
+    private HashMap<Integer, Icon> players;
     /** the fields of the view*/
     private JButton[] buttons;
     private LinkedList<ActionListener> actionListeners = new LinkedList<>();
@@ -29,13 +28,11 @@ public class GameView extends JPanel implements ActionListener{
      * Creates the GameView for Othello
      * @param width the number of fields in the width
      * @param height the number of fields in the height
-     * @param players the representation of the players by their id
      */
-    public GameView(int width, int height, HashMap<Integer, Icon> players) {
+    public GameView(int width, int height) {
         super(new GridLayout(width, height, 10, 10));
         setBackground(Color.BLACK);
         size = width*height;
-        this.players = players;
         buttons = new JButton[width*height];
         IntStream.range(0, size)
                 .forEach(nr-> {
@@ -49,6 +46,10 @@ public class GameView extends JPanel implements ActionListener{
         setVisible(true);
     }
 
+    public void setPlayers(HashMap<Integer, Icon> players) {
+        this.players = players;
+    }
+
     /**
      * Action to perform when a button is pressed
      * @param actionEvent the event which occurred
@@ -57,7 +58,8 @@ public class GameView extends JPanel implements ActionListener{
         JButton button = (JButton) actionEvent.getSource();
         int nummer = IntStream.range(0, size)
                 .filter(nr -> button==buttons[nr])
-                .findFirst().getAsInt();
+                .findFirst()
+                .getAsInt();
         fireEvent(new ActionEvent(this, nummer, "PRESSED"));
     }
 

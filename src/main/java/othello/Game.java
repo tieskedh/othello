@@ -1,4 +1,5 @@
-import gui.AbstractModel;
+package othello;
+import othello.gui.*;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -181,6 +182,8 @@ public class Game extends AbstractModel {
 
     public void addActionListener(ActionListener listener) {
         listeners.add(listener);
+        int[][] test = new int[3][3];
+        System.out.println(test);
     }
 
     public void fire(ActionEvent event) {

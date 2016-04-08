@@ -1,5 +1,6 @@
-import gui.AbstractModel;
-import gui.GameView;
+package othello;
+import othello.gui.*;
+
 import nl.abstractteam.gamemodule.ClientAbstractGameModule;
 import nl.abstractteam.gamemodule.MoveListener;
 
@@ -13,7 +14,7 @@ import java.util.LinkedList;
 
 public class GameModule extends ClientAbstractGameModule implements ActionListener {
     private static final int BOARD_SIZE = 8;
-    private GameView gameView;
+    private GameView gameView=null;
 
     private HashMap<String, Integer> playerResults = new HashMap<>();
     private String moveDetails;
@@ -38,12 +39,11 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
     public GameModule(String playerOne, String playerTwo) {
         super(playerOne, playerTwo);
 
-        // TODO: 4-4-2016 remove
-        System.out.println("GameModule.GameModule");
-        System.out.println("playerOne = [" + playerOne + "], playerTwo = [" + playerTwo + "]");
-
-
         game = new Game(BOARD_SIZE, playerOne, playerTwo);
+
+        gameView = new GameView(BOARD_SIZE, BOARD_SIZE);
+        game.addActionListener(gameView);
+        gameView.addActionListener(this);
     }
 
     @Override
@@ -51,6 +51,7 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
         return gameView;
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         System.out.println("action performed" + e.getID());
         if (game.isClientsTurn()) {
@@ -80,7 +81,6 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
         System.out.println("Move carried out");
         game.doMove(Integer.parseInt(move));
         game.fireEvents();
-
 
         if (game.checkIfMatchDone()) {
             matchStatus = MATCH_FINISHED;
@@ -180,9 +180,8 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
             players.put(game.getClient(), white);
             players.put(game.getOpponent(), black);
         }
-        gameView = new GameView(BOARD_SIZE, BOARD_SIZE, players);
-        game.addActionListener(gameView);
-        gameView.addActionListener(this);
+
+        gameView.setPlayers(players);
     }
 
     @Override // TODO: 4-4-2016 implement 
@@ -190,28 +189,27 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
     	System.out.println("Othello AI -> I'm asked to do a move");
     	Board board = game.getBoard();
     	
-    	System.out.println(board.getBoardPieces());
     	int[][] boardPieces = Arrays.copyOf(board.getBoardPieces(), board.getBoardPieces().length);
     	
     	int[][] newBoardPieces = new int[8][8];
     	for (int i = 0; i < boardPieces.length; i++) {
-    		for (int j = 0; j < boardPieces[i].length; j++) {
-    			newBoardPieces[i][j] = boardPieces[i][j];
-    		}
+            System.arraycopy(boardPieces[i], 0, newBoardPieces[i], 0, boardPieces[i].length);
     	}
     	
     	int[] possibleMoves = game.getValidSets();
     	
-    	int score = 0;
+    	int score = Integer.MIN_VALUE;
+        int tempScore;
     	int move = -1;
-    	for(int i = 0; i < possibleMoves.length; i++) {
-    		board.doMove(game.intToPoint(possibleMoves[i]), game.getClient());
-    		if(board.getOccurrences(game.getClient()) > score) {
-    			score = board.getOccurrences(game.getClient());
-    			move = possibleMoves[i];
-    		}
-    		board.setBoardPieces(newBoardPieces);
-    	}
+        for (int possibleMove : possibleMoves) {
+            board.doMove(game.intToPoint(possibleMove), game.getClient());
+            tempScore = board.getOccurrences(game.getClient());
+            if (tempScore > score) {
+                score = tempScore;
+                move = possibleMove;
+            }
+            board.setBoardPieces(newBoardPieces);
+        }
     	
     	if(move == -1){
     		return null;

@@ -1,3 +1,5 @@
+import othello.GameModule;
+
 import javax.swing.*;
 import java.awt.*;
 

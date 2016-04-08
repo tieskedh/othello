@@ -1,4 +1,4 @@
-package gui;
+package othello.gui;
 
 /**
  * This class defines the data the model needs to provide

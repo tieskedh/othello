@@ -1,4 +1,4 @@
-import com.sun.org.apache.xpath.internal.SourceTree;
+package othello;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -39,6 +39,12 @@ public class Board {
         this.game = game;
         BOARD_SIZE = boardSize;
         board = new int[BOARD_SIZE][BOARD_SIZE];
+    }
+
+    public Board(Game game, int[][] board) {
+        this.board = board;
+        this.game = game;
+        BOARD_SIZE = board.length;
     }
 
     /**
@@ -94,7 +100,6 @@ public class Board {
         board[location.x][location.y] = player;
         game.piecePlaced(location, player);
     }
-
     /**
      * Flips the side of a piece.
      * If no Piece is placed, keeps the field untouched
