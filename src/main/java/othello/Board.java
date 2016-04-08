@@ -253,7 +253,6 @@ public class Board {
      * @param boardPieces
      */
     public void setBoardPieces(int[][] boardPieces) {
-        System.out.println(this);
         int[][] newBoardPieces = new int[8][8];
         for (int i = 0; i < boardPieces.length; i++) {
             for (int j = 0; j < boardPieces[i].length; j++) {
@@ -261,7 +260,6 @@ public class Board {
             }
         }
         this.board = Arrays.copyOf(newBoardPieces, newBoardPieces.length);
-        System.out.println(this);
     }
 
     public int[][] getBoardPieces() {

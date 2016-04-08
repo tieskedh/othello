@@ -181,13 +181,9 @@ public class Game extends AbstractModel {
      * @throws IllegalStateException
      */
     private void doMove(Point location) throws IllegalStateException {
-        System.out.println("Othello doMove -> current player = " + playerState.currentPlayer);
-        System.out.println("Othello doMove -> my turn  = " + isClientsTurn());
         if (board.doMove(location, playerState.currentPlayer)) {
-            System.out.println("doMove player: " + playerState.currentPlayer + "did move " + location);
             setSide = playerState.currentPlayer;
         } else {
-            System.out.println("doMove player: " + playerState.currentPlayer + "could not do move " + location);
             throw new IllegalStateException("False move. Not allowed.");
         }
     }
@@ -220,11 +216,7 @@ public class Game extends AbstractModel {
     public void setClientBegins(boolean clientBegins) {
         playerState.setClientStarts(clientBegins);
         if (clientBegins) {
-            System.out.println("Client should begin");
             doClientTurn();
-        } else {
-            System.out.println("Oponent should begin");
-            doOpponentTurn();
         }
     }
 
@@ -237,16 +229,9 @@ public class Game extends AbstractModel {
      * Enables buttons for Client
      */
     private void doClientTurn() {
-        System.out.println("Client can perform move");
         fire(new ActionEvent(this, AbstractModel.TURN_START, "CLIENT IS ON SET"));
     }
 
-    /**
-     * Only informs Client that Opponent has the turn, as no further action is needed.
-     */
-    private void doOpponentTurn() {
-        System.out.println("It's the turn of the opponent");
-    }
 
     /**
      * adds ActionListener to the list.
@@ -256,7 +241,6 @@ public class Game extends AbstractModel {
     public void addActionListener(ActionListener listener) {
         listeners.add(listener);
         int[][] test = new int[3][3];
-        System.out.println(test);
     }
 
     /**
@@ -343,8 +327,6 @@ public class Game extends AbstractModel {
     public void turnStart() {
         if (playerState.isClientTurn()) {
             doClientTurn();
-        } else {
-            doOpponentTurn();
         }
     }
 
@@ -352,7 +334,6 @@ public class Game extends AbstractModel {
      * Sets the Board up for a standarized games
      */
     public void prepareStandardGame() {
-        System.out.println("PREPARE GAME");
         board.prepareStandardGame();
         //informs the View of the new pieces
         fireEvents();

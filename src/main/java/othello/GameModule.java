@@ -40,10 +40,6 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
     public GameModule(String playerOne, String playerTwo) {
         super(playerOne, playerTwo);
 
-        // TODO: 4-4-2016 remove
-        System.out.println("GameModule.GameModule");
-        System.out.println("playerOne = [" + playerOne + "], playerTwo = [" + playerTwo + "]");
-
         game = new Game(BOARD_SIZE, playerOne, playerTwo);
 
         gameView = new GameView(BOARD_SIZE, BOARD_SIZE);
@@ -64,20 +60,16 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
      */
     @Override
     public void actionPerformed(ActionEvent e) {
-        System.out.println("action performed" + e.getID());
         if (game.isClientsTurn()) {
             for (MoveListener moveListener : moveListeners) {
                 moveListener.movePerformed(String.valueOf(e.getID()));
             }
-            System.out.println("Move carried out");
         }
     }
 
     @Override
     public void doPlayerMove(String player, String move) throws IllegalStateException {
         game.clearMoves();
-        System.out.println("doPlayerMove: " + player + "wants to do move " + move);
-
         game.fireEvents();
 
         // string in de vorm van 0-63 / 0-8,0-8 binnen
@@ -89,9 +81,10 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
             throw new IllegalStateException("IT is not the turn of: " + player);
         }
 
-        System.out.println("Move carried out");
         game.doMove(Integer.parseInt(move));
         game.fireEvents();
+        game.endTurn();
+
 
         //Checks and handles the end of the match.
         if (game.checkIfMatchDone()) {
@@ -99,10 +92,8 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
             moveDetails = "Done";
             playerResults.put(player, PLAYER_WIN);
             playerResults.put(otherPlayer(player), PLAYER_LOSS);
-            System.out.println("MATCH IS OVER");
         } else {
             moveDetails = "Next";
-            game.endTurn();
             game.turnStart();
         }
     }
@@ -112,7 +103,6 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
         if (matchStatus != MATCH_FINISHED) {
             throw new IllegalStateException("Illegal match state");
         }
-        System.out.println("server called getPlayerScore");
         return game.getScore(player);
     }
 
@@ -121,13 +111,11 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
         if (matchStatus != MATCH_FINISHED) {
             throw new IllegalStateException("Illegal match state");
         }
-        System.out.println("server called getMatchResultComment");
         return "The match has come to an end.";
     }
 
     @Override
     public int getMatchStatus() {
-        System.out.println("server called getMatchStatus" + matchStatus);
         return matchStatus;
     }
 
@@ -148,7 +136,6 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
         if (matchStatus != MATCH_STARTED) {
             throw new IllegalStateException("Illegal match state");
         }
-        System.out.println(game.getCurrentPlayer() + " should do the next move");
         return game.getCurrentPlayer();
     }
 
@@ -157,7 +144,6 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
         if (matchStatus != MATCH_FINISHED) {
             throw new IllegalStateException("Illegal match state");
         }
-        System.out.println("Server called getPlayerResult");
         return playerResults.get(player);
     }
 
@@ -166,14 +152,12 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
         if (matchStatus != MATCH_STARTED) {
             throw new IllegalStateException("Illegal match state");
         }
-        System.out.println("Server called getTurnMessage");
         return (moveDetails == null) ? "Place your piece." : moveDetails;
     }
 
     // called 1st
     @Override
     public void setClientBegins(boolean clientBegins) {
-        System.out.println("setClientBeginsBEGINS!");
         game.setClientBegins(clientBegins);
     }
 
@@ -206,7 +190,6 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
      */
     @Override // TODO: 4-4-2016 implement
     public String getAIMove() {
-        System.out.println("Othello AI -> I'm asked to do a move");
         Board board = game.getBoard();
 
         int[][] boardPieces = Arrays.copyOf(board.getBoardPieces(), board.getBoardPieces().length);
@@ -241,7 +224,6 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
     @Override
     public void start() throws IllegalStateException {
         game.prepareStandardGame();
-        System.out.println(game);
         game.turnStart();
         matchStatus = MATCH_STARTED;
 
