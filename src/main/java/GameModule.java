@@ -187,7 +187,25 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
 
     @Override // TODO: 4-4-2016 implement 
     public String getAIMove() {
-        return null;
+    	Board board = game.getBoard();
+    	int[][] boardPieces = board.getBoardPieces();
+    	
+    	int[] possibleMoves = game.getValidSets();
+    	
+    	int score = 0;
+    	int move = -1;
+    	for(int i = 0; i < possibleMoves.length; i++) {
+    		board.doMove(game.intToPoint(possibleMoves[i]), game.getClient());
+    		if(board.getOccurrences(game.getClient()) > score) {
+    			score = board.getOccurrences(game.getClient());
+    			move = possibleMoves[i];
+    		}
+    		board.setBoardPieces(boardPieces);
+    	}
+    	
+    	if(move == -1)
+    		return null;
+    	return "" + move;
     }
 
     //called 3rd

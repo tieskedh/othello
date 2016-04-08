@@ -192,7 +192,7 @@ public class Game extends AbstractModel {
      * @param location the location to convert
      * @return the converted location
      */
-    private Point intToPoint(int location) {
+    Point intToPoint(int location) {
         return new Point(location / board.getSize(), location % board.getSize());
     }
 
