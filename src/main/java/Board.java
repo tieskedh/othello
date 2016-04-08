@@ -240,4 +240,12 @@ public class Board {
         }
         return sb.toString();
     }
+    
+    public void setBoardPieces(int[][] boardPieces) {
+    	this.board = boardPieces;
+    }
+    
+    public int[][] getBoardPieces() {
+    	return this.board;
+    }
 }

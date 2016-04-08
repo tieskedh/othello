@@ -277,4 +277,8 @@ public class Game extends AbstractModel {
     public String toString() {
         return board.toString();
     }
+    
+    public Board getBoard() {
+    	return this.board;
+    }
 }
