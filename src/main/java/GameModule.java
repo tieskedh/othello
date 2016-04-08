@@ -206,11 +206,6 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
     	if(move == -1)
     		return null;
     	return "" + move;
-    	
-    	
-    	//Zie je dit???
-    	
-    	
     }
 
     //called 3rd
