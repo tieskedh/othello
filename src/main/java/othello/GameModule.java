@@ -178,8 +178,8 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
     public void setClientPlayPiece(String s) {
         HashMap<Integer, Icon> players = new HashMap<>();
 
-        ImageIcon black = new ImageIcon(getClass().getResource("black.png"));
-        ImageIcon white = new ImageIcon(getClass().getResource("white.png"));
+        ImageIcon black = new ImageIcon(getClass().getResource("/black.png"));
+        ImageIcon white = new ImageIcon(getClass().getResource("/white.png"));
 
         if (s.equals(BLACK)) {
             players.put(game.getClient(), black);
