@@ -7,7 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -187,7 +187,36 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
 
     @Override // TODO: 4-4-2016 implement 
     public String getAIMove() {
-        return null;
+    	System.out.println("Othello AI -> I'm asked to do a move");
+    	Board board = game.getBoard();
+    	
+    	System.out.println(board.getBoardPieces());
+    	int[][] boardPieces = Arrays.copyOf(board.getBoardPieces(), board.getBoardPieces().length);
+    	
+    	int[][] newBoardPieces = new int[8][8];
+    	for (int i = 0; i < boardPieces.length; i++) {
+    		for (int j = 0; j < boardPieces[i].length; j++) {
+    			newBoardPieces[i][j] = boardPieces[i][j];
+    		}
+    	}
+    	
+    	int[] possibleMoves = game.getValidSets();
+    	
+    	int score = 0;
+    	int move = -1;
+    	for(int i = 0; i < possibleMoves.length; i++) {
+    		board.doMove(game.intToPoint(possibleMoves[i]), game.getClient());
+    		if(board.getOccurrences(game.getClient()) > score) {
+    			score = board.getOccurrences(game.getClient());
+    			move = possibleMoves[i];
+    		}
+    		board.setBoardPieces(newBoardPieces);
+    	}
+    	
+    	if(move == -1){
+    		return null;
+    	}
+    	return "" + move;
     }
 
     //called 3rd
