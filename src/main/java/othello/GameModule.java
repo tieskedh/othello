@@ -1,6 +1,7 @@
 package othello;
 
 import othello.ai.AI;
+import othello.ai.GreedyAI;
 import othello.ai.PossibleMovesAI;
 import othello.gui.GameView;
 import nl.abstractteam.gamemodule.ClientAbstractGameModule;
@@ -49,7 +50,6 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
         game = new Game(playerOne, playerTwo);
         game.setBoard(board);
         board.addActionListener(game);
-        ai = new PossibleMovesAI(game);
 
         gameView = new GameView(BOARD_SIZE, BOARD_SIZE);
         game.addActionListener(gameView);
@@ -180,6 +180,11 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
     public void setClientBegins(boolean clientBegins) {
         System.out.println("setClientBeginsBEGINS!");
         game.setClientBegins(clientBegins);
+        if(clientBegins) {
+            ai=new PossibleMovesAI(game);
+        } else {
+            ai = new PossibleMovesAI(game);
+        }
     }
 
     //called 2nd
