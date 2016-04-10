@@ -1,17 +1,17 @@
 package othello;
 
-import othello.gui.AbstractModel;
+import othello.ai.AI;
+import othello.ai.PossibleMovesAI;
 import othello.gui.GameView;
 import nl.abstractteam.gamemodule.ClientAbstractGameModule;
 import nl.abstractteam.gamemodule.MoveListener;
+import othello.utility.WeightedMove;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.*;
 
 public class GameModule extends ClientAbstractGameModule implements ActionListener {
     private static final int BOARD_SIZE = 8;
@@ -28,6 +28,7 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
     public static final String[] GAME_PIECES = new String[]{WHITE, BLACK};
 
     public final Game game;
+    public AI ai;
 
     /**
      * Mandatory constructor.
@@ -44,11 +45,16 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
         System.out.println("GameModule.GameModule");
         System.out.println("playerOne = [" + playerOne + "], playerTwo = [" + playerTwo + "]");
 
-        game = new Game(BOARD_SIZE, playerOne, playerTwo);
+        Board board = new Board(BOARD_SIZE);
+        game = new Game(playerOne, playerTwo);
+        game.setBoard(board);
+        board.addActionListener(game);
+        ai = new PossibleMovesAI(game);
 
         gameView = new GameView(BOARD_SIZE, BOARD_SIZE);
         game.addActionListener(gameView);
         gameView.addActionListener(this);
+
     }
 
     @Override
@@ -75,10 +81,9 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
 
     @Override
     public void doPlayerMove(String player, String move) throws IllegalStateException {
-        game.clearMoves();
         System.out.println("doPlayerMove: " + player + "wants to do move " + move);
 
-        game.fireEvents();
+        game.fireEvents(true);
 
         // string in de vorm van 0-63 / 0-8,0-8 binnen
         if (matchStatus != MATCH_STARTED) {
@@ -91,7 +96,7 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
 
         System.out.println("Move carried out");
         game.doMove(Integer.parseInt(move));
-        game.fireEvents();
+        game.fireEvents(false);
 
         //Checks and handles the end of the match.
         if (game.checkIfMatchDone()) {
@@ -196,7 +201,6 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
         gameView.setPlayers(players);
     }
 
-
     /**
      * Contains the logic for the AI players.
      * If the Client is set as an AI, the Framework will use this method to acquire its move, instead of using a View Event
@@ -206,42 +210,15 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
      */
     @Override // TODO: 4-4-2016 implement
     public String getAIMove() {
-        System.out.println("Othello AI -> I'm asked to do a move");
-        Board board = game.getBoard();
-
-        int[][] boardPieces = Arrays.copyOf(board.getBoardPieces(), board.getBoardPieces().length);
-
-        int[][] newBoardPieces = new int[8][8];
-        for (int i = 0; i < boardPieces.length; i++) {
-            System.arraycopy(boardPieces[i], 0, newBoardPieces[i], 0, boardPieces[i].length);
-        }
-
-        int[] possibleMoves = game.getValidSets();
-
-        int score = Integer.MIN_VALUE;
-        int tempScore;
-        int move = -1;
-        for (int possibleMove : possibleMoves) {
-            board.doMove(game.intToPoint(possibleMove), game.getClient());
-            tempScore = board.getOccurrences(game.getClient());
-            if (tempScore > score) {
-                score = tempScore;
-                move = possibleMove;
-            }
-            board.setBoardPieces(newBoardPieces);
-        }
-
-        if (move == -1) {
-            return null;
-        }
-        return "" + move;
+        return ai.getMove();
     }
+
+
 
     //called 3rd
     @Override
     public void start() throws IllegalStateException {
         game.prepareStandardGame();
-        System.out.println(game);
         game.turnStart();
         matchStatus = MATCH_STARTED;
 
