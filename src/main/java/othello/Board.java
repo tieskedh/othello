@@ -17,11 +17,11 @@ public class Board {
     /**
      * represents a space with a piece of the client
      */
-    private static final int PLAYER_1 = 1;
+    public static final int PLAYER_1 = 1;
     /**
      * represents a space with the piece of the opposing player
      */
-    private static final int PLAYER_2 = 2;
+    public static final int PLAYER_2 = 2;
     /**
      * The size of a side of the board
      */

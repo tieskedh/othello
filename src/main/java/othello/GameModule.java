@@ -1,5 +1,6 @@
 package othello;
 
+import othello.ai.NeuralAI;
 import othello.gui.AbstractModel;
 import othello.gui.GameView;
 import nl.abstractteam.gamemodule.ClientAbstractGameModule;
@@ -9,6 +10,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -28,6 +33,8 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
     public static final String[] GAME_PIECES = new String[]{WHITE, BLACK};
 
     public final Game game;
+    private NeuralAI neuralAI;
+    private boolean playAsNetwork = true;
 
     /**
      * Mandatory constructor.
@@ -41,7 +48,6 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
         super(playerOne, playerTwo);
 
         game = new Game(BOARD_SIZE, playerOne, playerTwo);
-
         gameView = new GameView(BOARD_SIZE, BOARD_SIZE);
         game.addActionListener(gameView);
         gameView.addActionListener(this);
@@ -159,6 +165,14 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
     @Override
     public void setClientBegins(boolean clientBegins) {
         game.setClientBegins(clientBegins);
+        initNeuralAI(clientBegins);
+    }
+
+    private void initNeuralAI(boolean clientBegins) {
+        int side = clientBegins? Board.PLAYER_1:Board.PLAYER_2;
+        int opponent = clientBegins?Board.PLAYER_2:Board.PLAYER_1;
+        InputStream stream = getClass().getResourceAsStream("/network.json");
+        neuralAI = new NeuralAI(side,opponent,stream,game);
     }
 
     //called 2nd
@@ -190,6 +204,7 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
      */
     @Override // TODO: 4-4-2016 implement
     public String getAIMove() {
+        if(playAsNetwork)return ""+neuralAI.getNetworkMove();
         Board board = game.getBoard();
 
         int[][] boardPieces = Arrays.copyOf(board.getBoardPieces(), board.getBoardPieces().length);
