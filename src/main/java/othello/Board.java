@@ -263,6 +263,12 @@ public class Board {
     }
 
     public int[][] getBoardPieces() {
-        return this.board;
+    	int[][] newBoardPieces = new int[8][8];
+        for (int i = 0; i < board.length; i++) {
+            for (int j = 0; j < board[i].length; j++) {
+                newBoardPieces[i][j] = board[i][j];
+            }
+        }
+        return newBoardPieces;
     }
 }
