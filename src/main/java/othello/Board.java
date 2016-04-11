@@ -31,7 +31,7 @@ public class Board {
      * The size of a side of the board
      */
     protected final int BOARD_SIZE;
-    protected int board[][];
+    public int board[][];
     private ArrayList<ActionListener> actionListeners = new ArrayList<>();
     private Move lastMove;
 
@@ -85,7 +85,7 @@ public class Board {
      * @param player   the player which places the move
      * @see #doMove(Point, int)
      */
-    private void doMoveInternal(Point location, int player) {
+    public void doMoveInternal(Point location, int player) {
         setAtLocation(location, player);
         IntStream.range(0, 9)
                 .mapToObj(nr -> checkLinePieces(location, nr / 3 - 1, nr % 3 - 1, player, new ArrayList<>()))
@@ -265,6 +265,27 @@ public class Board {
         }
         return sb.toString();
     }
+
+    public Move getLastMove() {
+        return lastMove;
+    }
+
+    /**
+     * Sets up the board for the AI player
+     *
+     * @param boardPieces
+     */
+    public void setBoardPieces(int[][] boardPieces) {
+        int[][] newBoardPieces = new int[8][8];
+        for (int i = 0; i < boardPieces.length; i++) {
+            for (int j = 0; j < boardPieces[i].length; j++) {
+                newBoardPieces[i][j] = boardPieces[i][j];
+            }
+        }
+        this.board = Arrays.copyOf(newBoardPieces, newBoardPieces.length);
+    }
+    
+
     public int[][] getBoardPieces() {
     	int[][] newBoardPieces = new int[8][8];
         for (int i = 0; i < board.length; i++) {
@@ -274,8 +295,16 @@ public class Board {
         }
         return newBoardPieces;
     }
-
-    public Move getLastMove() {
-        return lastMove;
+    
+    public int getEmptySpaces(){
+    	int spaces = 0;
+    	
+    	for (int i = 0; i < board.length; i++) {
+            for (int j = 0; j < board[i].length; j++) {
+                if(board[i][j] == this.EMPTY)
+                	spaces++;
+            }
+        }
+    	return spaces;
     }
 }

@@ -249,10 +249,19 @@ public class Game extends AbstractModel implements ActionListener {
      * @param location the location to convert
      * @return the converted location
      */
-    Point intToPoint(int location) {
+    public Point intToPoint(int location) {
         return new Point(location / board.getSize(), location % board.getSize());
     }
-
+    
+    /**
+     * Converts the location from a Point(x,y) into an Integer
+     *
+     * @param point the location to convert
+     * @return the converted location
+     */
+    public int pointToInt(Point point) {
+        return point.x * board.getSize() + point.y;
+    }
 
     /**
      * Ends the player's turn
