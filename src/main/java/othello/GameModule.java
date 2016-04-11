@@ -1,7 +1,7 @@
 package othello;
 
-import othello.ai.NeuralAI;
-import othello.gui.AbstractModel;
+import othello.ai.AI;
+import othello.ai.minimax.PossibleMovesAI;
 import othello.gui.GameView;
 import nl.abstractteam.gamemodule.ClientAbstractGameModule;
 import nl.abstractteam.gamemodule.MoveListener;
@@ -10,11 +10,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -33,8 +28,7 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
     public static final String[] GAME_PIECES = new String[]{WHITE, BLACK};
 
     public final Game game;
-    private NeuralAI neuralAI;
-    private boolean playAsNetwork = true;
+    public AI ai;
 
     /**
      * Mandatory constructor.
@@ -47,7 +41,15 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
     public GameModule(String playerOne, String playerTwo) {
         super(playerOne, playerTwo);
 
-        game = new Game(BOARD_SIZE, playerOne, playerTwo);
+        // TODO: 4-4-2016 remove
+        System.out.println("GameModule.GameModule");
+        System.out.println("playerOne = [" + playerOne + "], playerTwo = [" + playerTwo + "]");
+
+        Board board = new Board(BOARD_SIZE);
+        game = new Game(playerOne, playerTwo);
+        game.setBoard(board);
+        board.addActionListener(game);
+
         gameView = new GameView(BOARD_SIZE, BOARD_SIZE);
         game.addActionListener(gameView);
         gameView.addActionListener(this);
@@ -75,8 +77,7 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
 
     @Override
     public void doPlayerMove(String player, String move) throws IllegalStateException {
-        game.clearMoves();
-        game.fireEvents();
+        game.fireEvents(true);
 
         int intMove = Integer.parseInt(move);
         // string in de vorm van 0-63 / 0-8,0-8 binnen
@@ -91,10 +92,9 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
             throw new IllegalStateException("Move outside boundaries of 0-63");
         }
 
-        game.doMove(intMove);
-        game.fireEvents();
-        game.endTurn();
-
+        System.out.println("Move carried out");
+        game.doMove(Integer.parseInt(move));
+        game.fireEvents(false);
 
         //Checks and handles the end of the match.
         if (game.checkIfMatchDone()) {
@@ -169,14 +169,11 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
     @Override
     public void setClientBegins(boolean clientBegins) {
         game.setClientBegins(clientBegins);
-        initNeuralAI(clientBegins);
-    }
-
-    private void initNeuralAI(boolean clientBegins) {
-        int side = clientBegins ? Board.PLAYER_1 : Board.PLAYER_2;
-        int opponent = clientBegins ? Board.PLAYER_2 : Board.PLAYER_1;
-        InputStream stream = getClass().getResourceAsStream("/network.json");
-        neuralAI = new NeuralAI(side, opponent, stream, game);
+        if(clientBegins) {
+            ai=new PossibleMovesAI(game);
+        } else {
+            ai = new PossibleMovesAI(game);
+        }
     }
 
     //called 2nd
@@ -198,7 +195,6 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
         gameView.setPlayers(players);
     }
 
-
     /**
      * Contains the logic for the AI players.
      * If the Client is set as an AI, the Framework will use this method to acquire its move, instead of using a View Event
@@ -208,35 +204,7 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
      */
     @Override // TODO: 4-4-2016 implement
     public String getAIMove() {
-        if (playAsNetwork) return "" + neuralAI.getNetworkMove();
-        Board board = game.getBoard();
-
-        int[][] boardPieces = Arrays.copyOf(board.getBoardPieces(), board.getBoardPieces().length);
-
-        int[][] newBoardPieces = new int[8][8];
-        for (int i = 0; i < boardPieces.length; i++) {
-            System.arraycopy(boardPieces[i], 0, newBoardPieces[i], 0, boardPieces[i].length);
-        }
-
-        int[] possibleMoves = game.getValidSets();
-
-        int score = Integer.MIN_VALUE;
-        int tempScore;
-        int move = -1;
-        for (int possibleMove : possibleMoves) {
-            board.doMove(game.intToPoint(possibleMove), game.getClient());
-            tempScore = board.getOccurrences(game.getClient());
-            if (tempScore > score) {
-                score = tempScore;
-                move = possibleMove;
-            }
-            board.setBoardPieces(newBoardPieces);
-        }
-
-        if (move == -1) {
-            return null;
-        }
-        return "" + move;
+        return ai.getMove();
     }
 
     //called 3rd

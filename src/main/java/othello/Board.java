@@ -1,6 +1,11 @@
 package othello;
 
+import othello.gui.AbstractModel;
+import othello.utility.Move;
+
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -25,9 +30,10 @@ public class Board {
     /**
      * The size of a side of the board
      */
-    private final int BOARD_SIZE;
-    private int board[][];
-    private Game game;
+    protected final int BOARD_SIZE;
+    protected int board[][];
+    private ArrayList<ActionListener> actionListeners = new ArrayList<>();
+    private Move lastMove;
 
 
     /**
@@ -35,16 +41,24 @@ public class Board {
      *
      * @param boardSize the size of a side of the board
      */
-    public Board(int boardSize, Game game) {
-        this.game = game;
+    public Board(int boardSize) {
         BOARD_SIZE = boardSize;
         board = new int[BOARD_SIZE][BOARD_SIZE];
     }
 
     public Board(Game game, int[][] board) {
         this.board = board;
-        this.game = game;
         BOARD_SIZE = board.length;
+    }
+
+    public Board(Board board) {
+        int[][] pieces = board.getBoardPieces();
+        BOARD_SIZE = pieces.length;
+        int[][] piecesCopy = new int[BOARD_SIZE][BOARD_SIZE];
+        for (int x = 0; x < BOARD_SIZE; x++) {
+            System.arraycopy(pieces[x], 0, piecesCopy[x], 0, BOARD_SIZE);
+        }
+        this.board = piecesCopy;
     }
 
     /**
@@ -86,19 +100,8 @@ public class Board {
      * @param location the value where to get the value from
      * @return the value of the field specified by location
      */
-    private int getAtLocation(Point location) {
+    protected int getAtLocation(Point location) {
         return board[location.x][location.y];
-    }
-
-    /**
-     * Sets the value of the given location
-     *
-     * @param location The location where to set the value from
-     * @param player   the player which needs to be placed at the given location
-     */
-    private void setAtLocation(Point location, int player) {
-        board[location.x][location.y] = player;
-        game.piecePlaced(location, player);
     }
 
     /**
@@ -112,6 +115,25 @@ public class Board {
         setAtLocation(location, 3 - getAtLocation(location));
     }
 
+    /**
+     * Sets the value of the given location
+     *
+     * @param location The location where to set the value from
+     * @param player   the player which needs to be placed at the given location
+     */
+    protected void setAtLocation(Point location, int player) {
+        board[location.x][location.y] = player;
+        lastMove = new Move(player, location);
+        fire(new ActionEvent(this, AbstractModel.PLACE_PIECE, "PIECE PLACED"));
+    }
+
+    private void fire(ActionEvent event){
+        actionListeners.forEach(listener->listener.actionPerformed(event));
+    }
+
+    public void addActionListener(ActionListener actionListener) {
+        actionListeners.add(actionListener);
+    }
     /**
      * Counts the occurrence of the given player on the board
      *
@@ -168,21 +190,18 @@ public class Board {
     private ArrayList<Point> checkLinePieces(Point location, int offsetX, int offsetY, int player, ArrayList<Point> piecesList) {
 
         Point testPoint = new Point(location);
+        testPoint.move(testPoint.x + offsetX, testPoint.y+offsetY);
 
-        testPoint.move(testPoint.x + offsetX, testPoint.y + offsetY);
+        int opponent = 3-player;
+        while (!PointOutOfBounds(testPoint) && getAtLocation(testPoint)==opponent) {
+            piecesList.add(new Point(testPoint));
+            testPoint.move(testPoint.x + offsetX, testPoint.y+offsetY);
+        }
         //If not piece or out of bounds and empty
-        if (PointOutOfBounds(testPoint) || getAtLocation(testPoint) == 0 || (offsetX == 0 && offsetY == 0)) {
-            return new ArrayList<>();
+        if (PointOutOfBounds(testPoint) || getAtLocation(testPoint) == 0) {
+            piecesList.clear();
         }
-        //If it encounters another piece of the same player, end.
-        if (getAtLocation(testPoint) == player) {
-            return piecesList;
-        } else {
-            //if it encounters a piece of the opposite player, add to fliplist.
-            piecesList.add(testPoint);
-            //get new location and go recursive
-            return checkLinePieces(testPoint, offsetX, offsetY, player, piecesList);
-        }
+        return piecesList;
     }
 
     /**
@@ -224,15 +243,15 @@ public class Board {
         if (getAtLocation(location) != 0) {
             return false;
         }
-        return !IntStream.range(0, 9)
+
+        return IntStream.range(0, 9)
                 .mapToObj(nr -> checkLinePieces(location, nr / 3 - 1, nr % 3 - 1, player, new ArrayList<>()))
-                .allMatch(ArrayList::isEmpty);
+                .anyMatch(list->!list.isEmpty());
     }
 
     public int getSize() {
         return BOARD_SIZE;
     }
-
 
     @Override
     public String toString() {
@@ -246,22 +265,6 @@ public class Board {
         }
         return sb.toString();
     }
-
-    /**
-     * Sets up the board for the AI player
-     *
-     * @param boardPieces
-     */
-    public void setBoardPieces(int[][] boardPieces) {
-        int[][] newBoardPieces = new int[8][8];
-        for (int i = 0; i < boardPieces.length; i++) {
-            for (int j = 0; j < boardPieces[i].length; j++) {
-                newBoardPieces[i][j] = boardPieces[i][j];
-            }
-        }
-        this.board = Arrays.copyOf(newBoardPieces, newBoardPieces.length);
-    }
-
     public int[][] getBoardPieces() {
     	int[][] newBoardPieces = new int[8][8];
         for (int i = 0; i < board.length; i++) {
@@ -270,5 +273,9 @@ public class Board {
             }
         }
         return newBoardPieces;
+    }
+
+    public Move getLastMove() {
+        return lastMove;
     }
 }

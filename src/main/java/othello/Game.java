@@ -1,6 +1,7 @@
 package othello;
 
 import othello.gui.*;
+import othello.utility.Move;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -14,9 +15,9 @@ import java.util.LinkedList;
  * This contains all the information and the manipulation methods for playing the game.
  * It is extended from AbstractModel to give data to the GameView
  */
-public class Game extends AbstractModel {
+public class Game extends AbstractModel implements ActionListener {
     //contains the actual board and pieces to track internally.
-    private final Board board;
+    private Board board;
     private int setSide;
     private int setLocation;
 
@@ -27,48 +28,37 @@ public class Game extends AbstractModel {
 
     // Contains the current state of the players
     private Players playerState;
+    private boolean fireEvents;
 
     /**
      * Constructor
      *
-     * @param boardSize
      * @param playerOne
      * @param playerTwo
      */
-    public Game(int boardSize, String playerOne, String playerTwo) {
+    public Game(String playerOne, String playerTwo) {
         playerState = new Players(playerOne, playerTwo);
-        this.board = new Board(boardSize, this);
     }
 
-    /**
-     * Internal class Move.
-     * A Move object represents a single move from a player.
-     * Contains the player doing the move, and the location for that move.
-     */
-    class Move {
-        public final int player;
-        public final int location;
+    public void setBoard(Board board) {
+        this.board = board;
+    }
 
-        /**
-         * Constructor for Move class
-         *
-         * @param player
-         * @param location
-         */
-        public Move(int player, int location) {
-            this.player = player;
-            this.location = location;
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        Object source = e.getSource();
+        if(source instanceof Board) {
+            if(fireEvents) {
+                Move lastMove = ((Board)source).getLastMove();
+                setSide = lastMove.player;
+                setLocation = lastMove.location;
+                fire(new ActionEvent(this, AbstractModel.PLACE_PIECE, "PIECE PLACED"));
+            }
         }
+    }
 
-        /**
-         * Converts data to String format for printing.
-         *
-         * @return
-         */
-        public String toString() {
-            return "player: " + player +
-                    "Location" + location + "\n";
-        }
+    public void fireEvents(boolean fireEvents) {
+        this.fireEvents = fireEvents;
     }
 
 
@@ -252,36 +242,6 @@ public class Game extends AbstractModel {
         listeners.forEach(listener -> listener.actionPerformed(event));
     }
 
-    /**
-     * Adds changed added or flipped pieces to list to be processed.
-     *
-     * @param location
-     * @param player
-     */
-    public void piecePlaced(Point location, int player) {
-        moves.add(new Move(player, pointToInt(location)));
-    }
-
-    /**
-     * Executes all changes to the Board.
-     */
-    public void fireEvents() {
-        Arrays.stream(clearMoves())
-                .peek(move -> setSide = move.player)
-                .peek(move -> setLocation = move.location)
-                .forEach(move -> fire(new ActionEvent(this, AbstractModel.PLACE_PIECE, "Place Piece")));
-    }
-
-    /**
-     * clears out and returns list of changes to the Board.
-     *
-     * @return
-     */
-    public Move[] clearMoves() {
-        Move[] moveList = moves.toArray(new Move[0]);
-        moves.clear();
-        return moveList;
-    }
 
     /**
      * Converts the location from an Integer into a Point(x,y)
@@ -293,15 +253,6 @@ public class Game extends AbstractModel {
         return new Point(location / board.getSize(), location % board.getSize());
     }
 
-    /**
-     * Converts the location from a Point(x,y) into an Integer
-     *
-     * @param point the location to convert
-     * @return the converted location
-     */
-    private int pointToInt(Point point) {
-        return point.x * board.getSize() + point.y;
-    }
 
     /**
      * Ends the player's turn
@@ -334,9 +285,10 @@ public class Game extends AbstractModel {
      * Sets the Board up for a standarized games
      */
     public void prepareStandardGame() {
+        fireEvents=true;
         board.prepareStandardGame();
+        fireEvents=false;
         //informs the View of the new pieces
-        fireEvents();
     }
 
     /**
@@ -348,7 +300,8 @@ public class Game extends AbstractModel {
     @Override
     public int[] getValidSets() {
         return Arrays.stream(board.getPossibleMoves(playerState.currentPlayer))
-                .mapToInt(this::pointToInt)
+                .map(move->new Move(playerState.currentPlayer, move))
+                .mapToInt(move->move.location)
                 .toArray();
     }
 
