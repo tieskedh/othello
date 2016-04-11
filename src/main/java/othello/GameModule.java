@@ -2,6 +2,7 @@ package othello;
 
 import othello.ai.AI;
 import othello.ai.minimax.CustomCombinedAI;
+import othello.ai.minimax.GreedyAI;
 import othello.ai.minimax.PossibleMovesAI;
 import othello.gui.GameView;
 import nl.abstractteam.gamemodule.ClientAbstractGameModule;
@@ -89,6 +90,7 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
         if (!game.getCurrentPlayer().equals(player)) {
             throw new IllegalStateException("IT is not the turn of: " + player);
         }
+
         if (!(intMove >= 0 && intMove <= 63)) {
             throw new IllegalStateException("Move outside boundaries of 0-63");
         }
@@ -97,6 +99,7 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
         game.doMove(Integer.parseInt(move));
         game.fireEvents(false);
 
+        game.endTurn();
         //Checks and handles the end of the match.
         if (game.checkIfMatchDone()) {
             matchStatus = MATCH_FINISHED;
@@ -171,9 +174,9 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
     public void setClientBegins(boolean clientBegins) {
         game.setClientBegins(clientBegins);
         if(clientBegins) {
-            ai = new CustomCombinedAI(game);
+            ai = new GreedyAI(game);
         } else {
-            ai = new CustomCombinedAI(game);
+            ai = new GreedyAI(game);
         }
     }
 

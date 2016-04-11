@@ -67,13 +67,12 @@ public abstract class MiniMaxAI implements AI {
                 .orElse(null);
     }
 
-
-
     private WeightedMove evaluate(Board board, int side, int depth, Point move) {
         Board tempBoard = new Board(board);
         tempBoard.doMove(move.getLocation(), side);
 
         if(depth < maxDepth) {
+
             WeightedMove tempMove = progressStream(getLoopingStream(3-side), tempBoard, 3-side, depth+1);
             int score = (tempMove==null)? 0 : tempMove.getScore();
             return new WeightedMove(side, move).setScore(score);

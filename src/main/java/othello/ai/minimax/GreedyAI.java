@@ -15,4 +15,10 @@ public class GreedyAI extends MiniMaxAI {
         addEvaluator(new PieceCountEvaluator(), 1);
         addEvaluator(new PossibleMoveEvaluator(), 1);
     }
+
+    @Override
+    public int getScore(Board board, int side) {
+        System.out.println(side);
+        return super.getScore(board, side);
+    }
 }
