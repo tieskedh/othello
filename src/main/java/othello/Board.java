@@ -30,8 +30,8 @@ public class Board {
     /**
      * The size of a side of the board
      */
-    private final int BOARD_SIZE;
-    private int board[][];
+    protected final int BOARD_SIZE;
+    protected int board[][];
     private ArrayList<ActionListener> actionListeners = new ArrayList<>();
     private Move lastMove;
 
@@ -100,7 +100,7 @@ public class Board {
      * @param location the value where to get the value from
      * @return the value of the field specified by location
      */
-    private int getAtLocation(Point location) {
+    protected int getAtLocation(Point location) {
         return board[location.x][location.y];
     }
 
@@ -121,7 +121,7 @@ public class Board {
      * @param location The location where to set the value from
      * @param player   the player which needs to be placed at the given location
      */
-    private void setAtLocation(Point location, int player) {
+    protected void setAtLocation(Point location, int player) {
         board[location.x][location.y] = player;
         lastMove = new Move(player, location);
         fire(new ActionEvent(this, AbstractModel.PLACE_PIECE, "PIECE PLACED"));

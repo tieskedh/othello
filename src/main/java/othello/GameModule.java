@@ -1,12 +1,10 @@
 package othello;
 
 import othello.ai.AI;
-import othello.ai.GreedyAI;
-import othello.ai.PossibleMovesAI;
+import othello.ai.minimax.PossibleMovesAI;
 import othello.gui.GameView;
 import nl.abstractteam.gamemodule.ClientAbstractGameModule;
 import nl.abstractteam.gamemodule.MoveListener;
-import othello.utility.WeightedMove;
 
 import javax.swing.*;
 import java.awt.*;
