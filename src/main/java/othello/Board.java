@@ -22,11 +22,11 @@ public class Board {
     /**
      * represents a space with a piece of the client
      */
-    private static final int PLAYER_1 = 1;
+    public static final int PLAYER_1 = 1;
     /**
      * represents a space with the piece of the opposing player
      */
-    private static final int PLAYER_2 = 2;
+    public static final int PLAYER_2 = 2;
     /**
      * The size of a side of the board
      */
@@ -265,9 +265,14 @@ public class Board {
         }
         return sb.toString();
     }
-
     public int[][] getBoardPieces() {
-        return this.board;
+    	int[][] newBoardPieces = new int[8][8];
+        for (int i = 0; i < board.length; i++) {
+            for (int j = 0; j < board[i].length; j++) {
+                newBoardPieces[i][j] = board[i][j];
+            }
+        }
+        return newBoardPieces;
     }
 
     public Move getLastMove() {
