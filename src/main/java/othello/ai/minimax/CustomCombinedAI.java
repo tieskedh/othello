@@ -24,25 +24,49 @@ public class CustomCombinedAI implements AI{
 		Board board = game.getBoard();
 		int move;
 		
-		if (board.getEmptySpaces() <= 11) {
+		if (board.getEmptySpaces() <= 9) {
 			System.out.println("ohtello AI -> starting minimax");
 			move = getBestMiniMaxMove(board, 0, game.getClient(), game.getOpponent(), game.getClient())[1];
 		} else {
 			System.out.println("ohtello AI -> starting greedy");
-			move = getBestGreedyMove();
+			move = getBestGreedyMove(board);
+			//move = getBestAntiGreedyMove(board);
 		}
 		
 		if (move == -1) {
 			return null;
 		}
-		
-		System.out.println("AI decides the move needs to be: " + move);
 		return "" + move;
 	}
-    
-    private int getBestGreedyMove(){
-    	Board board = game.getBoard();
+	
+	private int getBestAntiGreedyMove(Board board) {
+		int[][] boardPieces = Arrays.copyOf(board.getBoardPieces(), board.getBoardPieces().length);
 
+        int[][] newBoardPieces = new int[8][8];
+        for (int i = 0; i < boardPieces.length; i++) {
+            System.arraycopy(boardPieces[i], 0, newBoardPieces[i], 0, boardPieces[i].length);
+        }
+
+        Point[] possibleMoves = board.getPossibleMoves(game.getClient());
+        int tempScore = 0;
+        int move = -1;
+        int opponentScore = Integer.MAX_VALUE;
+        
+        for(Point possibleMove : possibleMoves) {
+        	board.doMoveInternal(possibleMove, game.getClient());
+        	Point[] opponentMoves = board.getPossibleMoves(game.getOpponent());
+        	for (Point opponentMove : opponentMoves) {
+        		tempScore += getBoardPlaceRating(opponentMove);
+        	}
+        	if (tempScore < opponentScore) {
+        		move = game.pointToInt(possibleMove);
+        	}
+        }
+        
+        return move;
+	}
+    
+    private int getBestGreedyMove(Board board){
         int[][] boardPieces = Arrays.copyOf(board.getBoardPieces(), board.getBoardPieces().length);
 
         int[][] newBoardPieces = new int[8][8];
@@ -55,19 +79,27 @@ public class CustomCombinedAI implements AI{
         int score = Integer.MIN_VALUE;
         int tempScore;
         int move = -1;
+        int opponentPossibleMoves = Integer.MAX_VALUE;
+        int tempOpponentPossibleMoves;
         
         for (Point possibleMove : possibleMoves) {
             board.doMoveInternal(possibleMove, game.getClient());
             tempScore = board.getOccurrences(game.getClient());
             tempScore += getBoardPlaceRating(possibleMove);
-            if (tempScore > score) {
-            	score = tempScore;
-            	move = game.pointToInt(possibleMove);
+            if (board.getEmptySpaces() > 55) {
+            	tempOpponentPossibleMoves = board.getPossibleMoves(game.getOpponent()).length;
+            	if(board.getPossibleMoves(game.getOpponent()).length < opponentPossibleMoves) {
+            		opponentPossibleMoves = tempOpponentPossibleMoves;
+            		move = game.pointToInt(possibleMove);
+            	}
+            } else {
+            	if (tempScore > score) {
+	            	score = tempScore;
+	            	move = game.pointToInt(possibleMove);
+	            }
             }
             board.setBoardPieces(newBoardPieces);
         }
-        
-        System.out.println("greedy wants to move " + move);
         return move;
     }
 
@@ -78,7 +110,7 @@ public class CustomCombinedAI implements AI{
 		
 		Point[] possibleMoves = board.getPossibleMoves(turn);
 		
-		if (depth < 11 && possibleMoves.length > 0) {			
+		if (depth < 9 && possibleMoves.length > 0) {			
 			int[][] boardPieces = board.getBoardPieces();
 			int[][] oldBoardPieces = new int[8][8];
 			for (int i = 0; i < boardPieces.length; i++) {
@@ -87,20 +119,20 @@ public class CustomCombinedAI implements AI{
 				}
 			}
 
-			for (Point currentMove : possibleMoves) {
-				board.doMoveInternal(currentMove, turn);
+			for (Point possibleMove : possibleMoves) {
+				board.doMoveInternal(possibleMove, turn);
 				if (turn == client) {
 					currentScore = getBestMiniMaxMove(board, (depth + 1), client, opponent, switchSide(turn, client, opponent))[0];
-					currentScore += getBoardPlaceRating(currentMove);
+					//currentScore += getBoardPlaceRating(currentMove);
 					if (currentScore > bestScore){
-						bestMove = game.pointToInt(currentMove);
+						bestMove = game.pointToInt(possibleMove);
 						bestScore = currentScore;
 					}
 				} else {
 					currentScore = getBestMiniMaxMove(board, (depth + 1), client, opponent, switchSide(turn, client, opponent))[0];
-					currentScore += getBoardPlaceRating(currentMove);
+					//currentScore += getBoardPlaceRating(currentMove);
 					if (currentScore > bestScore){
-						bestMove = game.pointToInt(currentMove);
+						bestMove = game.pointToInt(possibleMove);
 						bestScore = currentScore;
 					}
 				}
@@ -112,7 +144,6 @@ public class CustomCombinedAI implements AI{
 				return new int[] {board.getOccurrences(opponent), bestMove};
 			return new int[] {board.getOccurrences(client), bestMove};
 		}
-		System.out.println("minimax wants to move " + bestMove);
 		return new int[] {bestScore, bestMove};
 	}
 	
