@@ -78,6 +78,7 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
         game.clearMoves();
         game.fireEvents();
 
+        int intMove = Integer.parseInt(move);
         // string in de vorm van 0-63 / 0-8,0-8 binnen
         if (matchStatus != MATCH_STARTED) {
             throw new IllegalStateException("Illegal match state");
@@ -86,8 +87,11 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
         if (!game.getCurrentPlayer().equals(player)) {
             throw new IllegalStateException("IT is not the turn of: " + player);
         }
+        if (!(intMove >= 0 && intMove <= 63)) {
+            throw new IllegalStateException("Move outside boundaries of 0-63");
+        }
 
-        game.doMove(Integer.parseInt(move));
+        game.doMove(intMove);
         game.fireEvents();
         game.endTurn();
 
@@ -169,10 +173,10 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
     }
 
     private void initNeuralAI(boolean clientBegins) {
-        int side = clientBegins? Board.PLAYER_1:Board.PLAYER_2;
-        int opponent = clientBegins?Board.PLAYER_2:Board.PLAYER_1;
+        int side = clientBegins ? Board.PLAYER_1 : Board.PLAYER_2;
+        int opponent = clientBegins ? Board.PLAYER_2 : Board.PLAYER_1;
         InputStream stream = getClass().getResourceAsStream("/network.json");
-        neuralAI = new NeuralAI(side,opponent,stream,game);
+        neuralAI = new NeuralAI(side, opponent, stream, game);
     }
 
     //called 2nd
@@ -204,7 +208,7 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
      */
     @Override // TODO: 4-4-2016 implement
     public String getAIMove() {
-        if(playAsNetwork)return ""+neuralAI.getNetworkMove();
+        if (playAsNetwork) return "" + neuralAI.getNetworkMove();
         Board board = game.getBoard();
 
         int[][] boardPieces = Arrays.copyOf(board.getBoardPieces(), board.getBoardPieces().length);
