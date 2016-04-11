@@ -9,7 +9,9 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.function.BiConsumer;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 /**
  * Created by thijs on 3-4-2016.
@@ -74,6 +76,16 @@ public class Board {
             return true;
         } else {
             return false;
+        }
+    }
+
+    public void forEach(BiConsumer<Point, Integer> consumer) {
+        Point point;
+        for(int x = 0; x < BOARD_SIZE; x++) {
+            for (int y = 0; y < BOARD_SIZE; y++) {
+                point = new Point(x, y);
+                consumer.accept(point, getAtLocation(point));
+            }
         }
     }
 

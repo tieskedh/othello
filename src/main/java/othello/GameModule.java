@@ -1,6 +1,7 @@
 package othello;
 
 import othello.ai.AI;
+import othello.ai.ExampleCombinedAI;
 import othello.ai.minimax.CustomCombinedAI;
 import othello.ai.minimax.GreedyAI;
 import othello.ai.minimax.PossibleMovesAI;
@@ -173,11 +174,7 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
     @Override
     public void setClientBegins(boolean clientBegins) {
         game.setClientBegins(clientBegins);
-        if(clientBegins) {
-            ai = new GreedyAI(game);
-        } else {
-            ai = new GreedyAI(game);
-        }
+        ai = new CustomCombinedAI(game);
     }
 
     //called 2nd
