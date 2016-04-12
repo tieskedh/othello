@@ -139,13 +139,14 @@ public class Board {
         fire(new ActionEvent(this, AbstractModel.PLACE_PIECE, "PIECE PLACED"));
     }
 
-    private void fire(ActionEvent event){
-        actionListeners.forEach(listener->listener.actionPerformed(event));
+    private void fire(ActionEvent event) {
+        actionListeners.forEach(listener -> listener.actionPerformed(event));
     }
 
     public void addActionListener(ActionListener actionListener) {
         actionListeners.add(actionListener);
     }
+
     /**
      * Counts the occurrence of the given player on the board
      *
@@ -202,12 +203,12 @@ public class Board {
     private ArrayList<Point> checkLinePieces(Point location, int offsetX, int offsetY, int player, ArrayList<Point> piecesList) {
 
         Point testPoint = new Point(location);
-        testPoint.move(testPoint.x + offsetX, testPoint.y+offsetY);
+        testPoint.move(testPoint.x + offsetX, testPoint.y + offsetY);
 
-        int opponent = 3-player;
-        while (!PointOutOfBounds(testPoint) && getAtLocation(testPoint)==opponent) {
+        int opponent = 3 - player;
+        while (!PointOutOfBounds(testPoint) && getAtLocation(testPoint) == opponent) {
             piecesList.add(new Point(testPoint));
-            testPoint.move(testPoint.x + offsetX, testPoint.y+offsetY);
+            testPoint.move(testPoint.x + offsetX, testPoint.y + offsetY);
         }
         //If not piece or out of bounds and empty
         if (PointOutOfBounds(testPoint) || getAtLocation(testPoint) == 0) {
@@ -258,7 +259,7 @@ public class Board {
 
         return IntStream.range(0, 9)
                 .mapToObj(nr -> checkLinePieces(location, nr / 3 - 1, nr % 3 - 1, player, new ArrayList<>()))
-                .anyMatch(list->!list.isEmpty());
+                .anyMatch(list -> !list.isEmpty());
     }
 
     public int getSize() {
@@ -278,6 +279,7 @@ public class Board {
         return sb.toString();
     }
 
+
     public Move getLastMove() {
         return lastMove;
     }
@@ -296,10 +298,10 @@ public class Board {
         }
         this.board = Arrays.copyOf(newBoardPieces, newBoardPieces.length);
     }
-    
+
 
     public int[][] getBoardPieces() {
-    	int[][] newBoardPieces = new int[8][8];
+        int[][] newBoardPieces = new int[8][8];
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[i].length; j++) {
                 newBoardPieces[i][j] = board[i][j];
@@ -307,10 +309,10 @@ public class Board {
         }
         return newBoardPieces;
     }
-    
+
     public int getEmptySpaces(){
     	int spaces = 0;
-    	
+
     	for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[i].length; j++) {
                 if(board[i][j] == this.EMPTY)

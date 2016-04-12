@@ -81,11 +81,13 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
     @Override
     public void doPlayerMove(String player, String move) throws IllegalStateException {
         game.fireEvents(true);
-
-        if(!move.matches("\\d+")) {
-            throw new IllegalStateException("Not a valid move");
+        int intMove;
+        try {
+            intMove = Integer.parseInt(move);
+        } catch (Exception e) {
+            throw new IllegalStateException("Move not Integer format.");
         }
-        int intMove = Integer.parseInt(move);
+
         // string in de vorm van 0-63 / 0-8,0-8 binnen
         if (matchStatus != MATCH_STARTED) {
             throw new IllegalStateException("Illegal match state");
