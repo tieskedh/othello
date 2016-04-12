@@ -13,9 +13,9 @@ public class CustomCombinedAI implements AI{
     private static final int[] RATING_TWO = 			{19, 20, 26, 29, 34, 37, 43, 44};
     private static final int[] RATING_ONE = 			{10, 11, 12, 13, 17, 22, 25, 27, 28, 30, 33, 35, 36, 38, 41, 46, 50, 51, 52, 53};
     private static final int[] RATING_MINUS_TWENTYFIVE = {1, 6, 8, 9, 14, 15, 48, 49, 54, 55, 57, 62};
-    private static final int EARLY_GAME_RATIO = 2;
-    private static final int MID_GAME_RATIO = 1;
-    private static final int POSITION_GAME_RATIO = 1;
+    private static final int EARLY_GAME_RATIO = 3;
+    private static final int MID_GAME_RATIO = 3;
+    private static final int POSITION_GAME_RATIO = 3;
     
     private Game game;
     
