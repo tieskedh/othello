@@ -82,6 +82,9 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
     public void doPlayerMove(String player, String move) throws IllegalStateException {
         game.fireEvents(true);
 
+        if(!move.matches("\\d+")) {
+            throw new IllegalStateException("Not a valid move");
+        }
         int intMove = Integer.parseInt(move);
         // string in de vorm van 0-63 / 0-8,0-8 binnen
         if (matchStatus != MATCH_STARTED) {
