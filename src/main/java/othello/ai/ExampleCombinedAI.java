@@ -2,10 +2,8 @@ package othello.ai;
 
 import othello.Board;
 import othello.Game;
-import othello.ai.evaluators.FixedFieldScoreEvaluator;
+import othello.ai.evaluators.UnflippablePieceSingularEvaluator;
 import othello.ai.evaluators.PossibleMoveEvaluator;
-import othello.ai.minimax.FixedFieldScoreAI;
-import othello.ai.minimax.GreedyAI;
 import othello.ai.minimax.MiniMaxAI;
 
 /**
@@ -15,23 +13,18 @@ public class ExampleCombinedAI implements AI{
 
     MiniMaxAI miniMax;
     Game game;
-
+    UnflippablePieceSingularEvaluator unflippablePieceSingularEvaluator;
     public ExampleCombinedAI(Game game) {
         this.game = game;
         miniMax = new MiniMaxAI(game, 1);
-        miniMax.addEvaluator(new FixedFieldScoreEvaluator(game), 1);
+        unflippablePieceSingularEvaluator = new UnflippablePieceSingularEvaluator(game.getBoard());
+//        miniMax.addEvaluator(new FixedFieldScoreEvaluator(), 1);
         miniMax.addEvaluator(new PossibleMoveEvaluator(), 1);
+        miniMax.addEvaluator(new UnflippablePieceSingularEvaluator(game.getBoard()), 2);
     }
 
     @Override
     public String getMove() {
-        Board board = game.getBoard();
-        if(board.getEmptySpaces() <= 11) {
-            return miniMax.setMaxDepth(10)
-                    .getMove();
-        } else {
-            return miniMax.setMaxDepth(11)
-                    .getMove();
-        }
+        return miniMax.setMaxDepth(1).getMove();
     }
 }

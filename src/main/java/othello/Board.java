@@ -11,7 +11,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.function.BiConsumer;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 /**
  * Created by thijs on 3-4-2016.
@@ -46,11 +45,6 @@ public class Board {
     public Board(int boardSize) {
         BOARD_SIZE = boardSize;
         board = new int[BOARD_SIZE][BOARD_SIZE];
-    }
-
-    public Board(Game game, int[][] board) {
-        this.board = board;
-        BOARD_SIZE = board.length;
     }
 
     public Board(Board board) {
@@ -112,7 +106,7 @@ public class Board {
      * @param location the value where to get the value from
      * @return the value of the field specified by location
      */
-    protected int getAtLocation(Point location) {
+    public int getAtLocation(Point location) {
         return board[location.x][location.y];
     }
 
@@ -236,11 +230,10 @@ public class Board {
      */
     public Point[] getPossibleMoves(int player) {
 
-        Point[] test = IntStream.range(0, BOARD_SIZE * BOARD_SIZE)
+        return IntStream.range(0, BOARD_SIZE * BOARD_SIZE)
                 .mapToObj(nr -> new Point(nr / BOARD_SIZE, nr % BOARD_SIZE))
                 .filter(location -> isValidMove(location, player))
                 .toArray(Point[]::new);
-        return test;
     }
 
     /**
@@ -269,10 +262,10 @@ public class Board {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        for (int x = 0; x < board.length; x++) {
-            for (int y = 0; y < board[0].length; y++) {
+        for (int[] column : board) {
+            for (int field : column) {
                 sb.append("\t");
-                sb.append(board[x][y]);
+                sb.append(field);
             }
             sb.append("\n");
         }
@@ -292,9 +285,7 @@ public class Board {
     public void setBoardPieces(int[][] boardPieces) {
         int[][] newBoardPieces = new int[8][8];
         for (int i = 0; i < boardPieces.length; i++) {
-            for (int j = 0; j < boardPieces[i].length; j++) {
-                newBoardPieces[i][j] = boardPieces[i][j];
-            }
+            System.arraycopy(boardPieces[i], 0, newBoardPieces[i], 0, boardPieces[i].length);
         }
         this.board = Arrays.copyOf(newBoardPieces, newBoardPieces.length);
     }
@@ -313,12 +304,16 @@ public class Board {
     public int getEmptySpaces(){
     	int spaces = 0;
 
-    	for (int i = 0; i < board.length; i++) {
-            for (int j = 0; j < board[i].length; j++) {
-                if(board[i][j] == this.EMPTY)
-                	spaces++;
+        for (int[] row : board) {
+            for (int field : row) {
+                if (field == EMPTY)
+                    spaces++;
             }
         }
     	return spaces;
+    }
+
+    public void removeActionListener(ActionListener listener) {
+        actionListeners.remove(listener);
     }
 }
