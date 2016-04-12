@@ -5,6 +5,7 @@ import othello.ai.ExampleCombinedAI;
 import othello.ai.minimax.CustomCombinedAI;
 import othello.ai.minimax.GreedyAI;
 import othello.ai.minimax.PossibleMovesAI;
+import othello.ai.minimax.RandomAI;
 import othello.gui.GameView;
 import nl.abstractteam.gamemodule.ClientAbstractGameModule;
 import nl.abstractteam.gamemodule.MoveListener;

@@ -27,10 +27,12 @@ public class CustomCombinedAI implements AI{
 		if (board.getEmptySpaces() <= 9) {
 			System.out.println("ohtello AI -> starting minimax");
 			move = getBestMiniMaxMove(board, 0, game.getClient(), game.getOpponent(), game.getClient())[1];
-		} else {
+		} else if (board.getEmptySpaces() > 40){
 			System.out.println("ohtello AI -> starting greedy");
 			move = getBestGreedyMove(board);
-			//move = getBestAntiGreedyMove(board);
+		} else {
+
+			move = getBestAntiGreedyMove(board);
 		}
 		
 		if (move == -1) {
@@ -42,9 +44,9 @@ public class CustomCombinedAI implements AI{
 	private int getBestAntiGreedyMove(Board board) {
 		int[][] boardPieces = Arrays.copyOf(board.getBoardPieces(), board.getBoardPieces().length);
 
-        int[][] newBoardPieces = new int[8][8];
+        int[][] oldBoardPieces = new int[8][8];
         for (int i = 0; i < boardPieces.length; i++) {
-            System.arraycopy(boardPieces[i], 0, newBoardPieces[i], 0, boardPieces[i].length);
+            System.arraycopy(boardPieces[i], 0, oldBoardPieces[i], 0, boardPieces[i].length);
         }
 
         Point[] possibleMoves = board.getPossibleMoves(game.getClient());
@@ -61,6 +63,8 @@ public class CustomCombinedAI implements AI{
         	if (tempScore < opponentScore) {
         		move = game.pointToInt(possibleMove);
         	}
+        	
+        	board.setBoardPieces(oldBoardPieces);
         }
         
         return move;
@@ -114,10 +118,8 @@ public class CustomCombinedAI implements AI{
 			int[][] boardPieces = board.getBoardPieces();
 			int[][] oldBoardPieces = new int[8][8];
 			for (int i = 0; i < boardPieces.length; i++) {
-				for (int j = 0; j < boardPieces[i].length; j++) {
-					oldBoardPieces[i][j] = boardPieces[i][j];
-				}
-			}
+	            System.arraycopy(boardPieces[i], 0, oldBoardPieces[i], 0, boardPieces[i].length);
+	        }
 
 			for (Point possibleMove : possibleMoves) {
 				board.doMoveInternal(possibleMove, turn);
