@@ -32,6 +32,13 @@ public class Move {
         this.location = location.x * BOARD_SIZE + location.y;
     }
 
+    public int getX() {
+        return location/BOARD_SIZE;
+    }
+
+    public int getY() {
+        return location%BOARD_SIZE;
+    }
 
 
     /**
@@ -40,8 +47,12 @@ public class Move {
      * @return
      */
     public String toString() {
-        return "player: " + player +
-                "Location" + location + "\n";
+        return "[ player: " + player +
+                ", Location" + location + " ]";
+    }
+
+    public Point getPoint() {
+        return new Point(getX(), getY());
     }
 }
 

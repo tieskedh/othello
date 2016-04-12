@@ -1,7 +1,6 @@
 package othello.ai.evaluators;
 
 import othello.Board;
-import othello.ai.AI;
 
 import java.awt.*;
 

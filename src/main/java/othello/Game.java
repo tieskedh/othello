@@ -230,7 +230,6 @@ public class Game extends AbstractModel implements ActionListener {
      */
     public void addActionListener(ActionListener listener) {
         listeners.add(listener);
-        int[][] test = new int[3][3];
     }
 
     /**
