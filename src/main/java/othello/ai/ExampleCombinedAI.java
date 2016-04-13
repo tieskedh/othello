@@ -24,7 +24,7 @@ public class ExampleCombinedAI implements AI{
     public ExampleCombinedAI(Game game) {
         this.game = game;
         board = game.getBoard();
-        miniMax = new MiniMaxAI(game, 3);
+        miniMax = new MiniMaxAI(game, 1).setMaxDepth(5);
         unflippablePieceAreaEvaluator = new UnflippablePieceAreaEvaluator(board);
         unflippablePieceSingularEvaluator = new UnflippablePieceSingularEvaluator(board);
         pieceCountEvaluator = new PieceCountEvaluator();
@@ -49,13 +49,18 @@ public class ExampleCombinedAI implements AI{
                 miniMax.addEvaluator(possibleMoveEvaluator, 1);
                 miniMax.addEvaluator(pieceCountEvaluator, 3);
                 miniMax.addEvaluator(fixedFieldScoreEvaluator, 1);
-               miniMax.addEvaluator(wallCountEvaluator, 1);
+//                miniMax.addEvaluator(wallCountEvaluator, 100);
             }
-        } else if(emptySpaces <= 50 && emptySpaces > 8) {
+        } else if(emptySpaces <= 50 && emptySpaces > 45) {
+            if(!secondFase) {
+                secondFase = true;
+//                miniMax.removeEvaluator(fixedFieldScoreEvaluator);
+            }
+        } else if(emptySpaces <= 45 && emptySpaces > 8) {
             if(!thirdFase) {
                 thirdFase = true;
-                miniMax.addEvaluator(unflippablePieceAreaEvaluator, 50);
-                miniMax.addEvaluator(unflippablePieceSingularEvaluator, 50);
+                miniMax.addEvaluator(unflippablePieceAreaEvaluator, 5);
+                miniMax.addEvaluator(unflippablePieceSingularEvaluator, 30);
             }
         } else if(!fourthFase){
             fourthFase = true;

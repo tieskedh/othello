@@ -10,13 +10,14 @@ import java.awt.event.ActionListener;
 /**
  * Created by thijs on 11-4-2016.
  */
-public class UnflippablePieceSingularEvaluator implements Evaluator, ActionListener{
+public class UnflippablePieceSingularEvaluator extends MiniMaxEvaluator implements Evaluator, ActionListener{
     int[][] stability;
 
 
     Board board;
 
     public UnflippablePieceSingularEvaluator(Board board, boolean shouldEvaluate) {
+        super(1);
         this.board = board;
         board.addActionListener(this);
         prepare();
@@ -109,6 +110,7 @@ public class UnflippablePieceSingularEvaluator implements Evaluator, ActionListe
 
     @Override
     public int getScore(Board board, int side, Point move) {
+        System.out.println(board);
         if(move==null) System.out.println("MOVE == NULL");
         return isLocked(move)?1:0;
     }

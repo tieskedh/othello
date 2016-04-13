@@ -14,7 +14,7 @@ import java.util.stream.Stream;
 /**
  * Created by thijs on 11-4-2016.
  */
-public class MiniMaxAI implements AI {
+public class MiniMaxAI implements AI, Evaluator {
     protected Game game;
     protected Board board;
     protected int currentPlayer;
@@ -34,8 +34,9 @@ public class MiniMaxAI implements AI {
         return this;
     }
 
-    public void addEvaluator(Evaluator evaluator, int score) {
+    public MiniMaxAI addEvaluator(Evaluator evaluator, int score) {
         evaluators.put(evaluator, score);
+        return this;
     }
 
     public MiniMaxAI removeEvaluator(Evaluator evaluator) {
@@ -49,38 +50,56 @@ public class MiniMaxAI implements AI {
 
     public final String getMove() {
         currentPlayer = game.getClient();
-        WeightedMove move = minimax(game.getBoard(), currentPlayer, 0, new Point(-1,-1));
-        if(move.location==-9) return ""+board.getPossibleMoves(currentPlayer)[0];
+        WeightedMove move = progressStream(getStartingStream(currentPlayer), board, currentPlayer, 1);
+        if(move==null) return ""+board.getPossibleMoves(currentPlayer)[0];
         return "" + move.location;
     }
 
-    public WeightedMove minimax(Board board, int player, int depth, Point move) {
-
-        WeightedMove maxMove = new WeightedMove(player, move)
-                .setScore(Integer.MIN_VALUE);
-        Board subBoard = new Board(board);
-        if(depth > maxDepth || getNextPLayer(board, player) == 0) {
-            return new WeightedMove(player, move)
-                    .setScore(getScore(subBoard, player, move, depth));
-        } else {
-            Point[] possibleMoves = board.getPossibleMoves(player);
-            if (!(possibleMoves.length == 0)) {
-                for (Point possibleMove : possibleMoves) {
-                    subBoard = new Board(board);
-                    subBoard.doMove(possibleMove, player);
-                    WeightedMove weightedMove = minimax(subBoard, 3 - player, depth + 1, possibleMove)
-                         .setLocation(possibleMove);
-                    if (maxMove.getScore() > weightedMove.getScore()) {
-                        maxMove = weightedMove;
-                    }
-                }
-            } else {
-                maxMove.setScore(-1 * getScore(subBoard, player, maxMove.getPoint(), depth+1));
-            }
-        }
-        return maxMove;
+    private Stream<Point> getPossibleMoveStream(int side) {
+        return Arrays.stream(board.getPossibleMoves(side));
     }
 
+    private Stream<Point> getStartingStream(int side) {
+        return getPossibleMoveStream(side).parallel();
+    }
+
+    private Stream<Point> getLoopingStream(int side) {
+        return getPossibleMoveStream(side);
+    }
+
+    private WeightedMove progressStream(Stream<Point> pointStream, Board board, int side, int depth) {
+        return pointStream.map(move -> evaluate(board, side, depth, move))
+                .filter(Objects::nonNull)
+                .max((move1, move2)->move1.getScore()-move2.getScore())
+                .orElse(null);
+    }
+
+    private WeightedMove evaluate(Board board, int side, int depth, Point move) {
+        //new board
+        Board tempBoard = new Board(board);
+        tempBoard.doMove(move.getLocation(), side);
+
+        //if depth < maxDepth
+        if(depth < maxDepth) {
+
+            //for each possible move, get the maximum evaluation
+            int opponent = getNextPLayer(board, side);
+            if(opponent==0) {
+                return new WeightedMove(side, move)
+                        .setScore(getScore(board, side, move, depth));
+            } else {
+                WeightedMove tempMove = progressStream(getLoopingStream(opponent), tempBoard, opponent, depth+1);
+                int score = (tempMove==null)? 0 : tempMove.getScore();
+                score += getScore(board, side,move, depth);
+                return new WeightedMove(side, move).setScore(score);
+            }
+        }
+        if(side==game.getClient()) {
+            return new WeightedMove(side, move).setScore(getScore(tempBoard, side, move, depth));
+        } else {
+            return new WeightedMove(side, move).setScore(-1*getScore(tempBoard, side, move, depth));
+        }
+    }
 
     private int getNextPLayer(Board board, int currentPlayer) {
         if(board.getPossibleMoves(3-currentPlayer).length==0) {
@@ -98,7 +117,7 @@ public class MiniMaxAI implements AI {
         int score = 0;
         for (Map.Entry<Evaluator, Integer> entry : evaluators.entrySet()) {
             if(entry.getKey() instanceof MiniMaxEvaluator) {
-                if(depth< ((MiniMaxEvaluator) entry.getKey()).maxDepth) {
+                if(depth <= ((MiniMaxEvaluator) entry.getKey()).maxDepth) {
                     score+=entry.getKey().getScore(board, side, move)*entry.getValue();
                 }
             } else {
@@ -106,5 +125,12 @@ public class MiniMaxAI implements AI {
             }
         }
         return score;
+    }
+
+    @Override
+    public int getScore(Board board, int side, Point move) {
+        WeightedMove weightedMove = progressStream(getStartingStream(currentPlayer), board, currentPlayer, 1);
+        if(weightedMove==null) return 0;
+        return weightedMove.getScore();
     }
 }

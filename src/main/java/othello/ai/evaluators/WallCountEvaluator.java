@@ -17,6 +17,8 @@ public class WallCountEvaluator implements Evaluator{
                 if(x==0 || x==7 || y==0 || y==7) {
                     if(pieces[x][y]==side) {
                         score++;
+                    } else if(pieces[x][y]==side-2){
+                        score-=4;
                     }
                 }
             }

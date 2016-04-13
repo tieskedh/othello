@@ -15,4 +15,9 @@ public class PossibleMovesAI extends MiniMaxAI {
         super(game, 3);
         addEvaluator(new PossibleMoveEvaluator(), 1);
     }
+
+    @Override
+    public int getScore(Board board, int side, Point move, int depth) {
+        return super.getScore(board, side, move, depth);
+    }
 }

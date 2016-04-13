@@ -14,13 +14,14 @@ import static othello.utility.Move.BOARD_SIZE;
 /**
  * Created by Gebruiker on 12/04/2016.
  */
-public class UnflippablePieceAreaEvaluator implements Evaluator, ActionListener {
+public class UnflippablePieceAreaEvaluator extends MiniMaxEvaluator implements Evaluator, ActionListener {
     private static final int PLAYER_ONE = 1;
     private static final int PLAYER_TWO = 2;
     private boolean[][] stablePieceArrayPlayerOne = new boolean[10][10];
     private boolean[][] stablePieceArrayPlayerTwo = new boolean[10][10];
 
     public UnflippablePieceAreaEvaluator(Board board) {
+        super(1);
         board.addActionListener(this);
 
         for(int i= 0; i  < 10; i++) {
@@ -120,8 +121,15 @@ public class UnflippablePieceAreaEvaluator implements Evaluator, ActionListener 
 
     @Override
     public int getScore(Board board, int side, Point move) {
+
+        System.out.println("player one");
+        System.out.println(Arrays.deepToString(stablePieceArrayPlayerOne));
+        System.out.println("player two");
+        System.out.println(Arrays.deepToString(stablePieceArrayPlayerTwo));
+
         int score = determineIfStable(move, side) ? 1 : 0;
-        int opponentScore = determineIfStable(move, 1-side)?1:0;
-        return score;
+        int opponentScore = determineIfStable(move, side-1)?1:0;
+        System.out.println(score+"for player "+side+" with move "+move);
+        return score-opponentScore*4;
     }
 }
