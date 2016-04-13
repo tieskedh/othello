@@ -7,16 +7,27 @@ import java.util.Random;
 import othello.Board;
 import othello.Game;
 
+/**
+ * The Class RandomAI.
+ */
 public class RandomAI implements AI{
 	private Game game;
 	private boolean timeLeft = true;
 	private int runningTime = 0;
 	private Random random = new Random();
 
+	/**
+	 * Instantiates a new random ai.
+	 *
+	 * @param game the game
+	 */
 	public RandomAI(Game game) {
 		this.game = game;
 	}
 
+	/* (non-Javadoc)
+	 * @see othello.ai.AI#getMove()
+	 */
 	@Override
 	public String getMove() {
 		timeLeft = true;
@@ -32,6 +43,12 @@ public class RandomAI implements AI{
 		return "" + move;
 	}
 
+	/**
+	 * Start finding best random move.
+	 *
+	 * @param board the board
+	 * @return the int
+	 */
 	private int startFindingBestRandomMove(Board board) {
 		int move = -1;
 		int score = Integer.MIN_VALUE;
@@ -63,6 +80,13 @@ public class RandomAI implements AI{
 		return move;
 	}
 
+	/**
+	 * Gets the best random move.
+	 *
+	 * @param board the board
+	 * @param client the client
+	 * @return the best random move
+	 */
 	private int[] getBestRandomMove(Board board, boolean client) {
 		int move = -1;
 		int score = Integer.MIN_VALUE;
@@ -107,6 +131,11 @@ public class RandomAI implements AI{
 		return new int[] {move, score};
 	}
 
+	/**
+	 * Timer.
+	 *
+	 * @param timeInMillis the time in millis
+	 */
 	private void timer(int timeInMillis){
 		runningTime = 0;
 		Runnable thread = () -> {

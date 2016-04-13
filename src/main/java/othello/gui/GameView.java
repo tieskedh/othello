@@ -12,7 +12,6 @@ import java.util.stream.IntStream;
 
 /**
  * The othello.gui for tictactoe
- * Created by Thijs de Haan on 24-3-2016.
  */
 public class GameView extends JPanel implements ActionListener {
 

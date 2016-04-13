@@ -31,19 +31,27 @@ public class Game extends AbstractModel implements ActionListener {
     private boolean fireEvents;
 
     /**
-     * Constructor
+     * Constructor.
      *
-     * @param playerOne
-     * @param playerTwo
+     * @param playerOne the player one
+     * @param playerTwo the player two
      */
     public Game(String playerOne, String playerTwo) {
         playerState = new Players(playerOne, playerTwo);
     }
 
+    /**
+     * Sets the board.
+     *
+     * @param board the new board
+     */
     public void setBoard(Board board) {
         this.board = board;
     }
 
+    /* (non-Javadoc)
+     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         Object source = e.getSource();
@@ -57,6 +65,11 @@ public class Game extends AbstractModel implements ActionListener {
         }
     }
 
+    /**
+     * Fire events.
+     *
+     * @param fireEvents the fire events
+     */
     public void fireEvents(boolean fireEvents) {
         this.fireEvents = fireEvents;
     }
@@ -77,10 +90,10 @@ public class Game extends AbstractModel implements ActionListener {
         private int currentPlayer = 1;
 
         /**
-         * Constructor
+         * Constructor.
          *
-         * @param playerOne
-         * @param playerTwo
+         * @param playerOne the player one
+         * @param playerTwo the player two
          */
         public Players(String playerOne, String playerTwo) {
             STARTING_PLAYER = playerOne;
@@ -95,10 +108,10 @@ public class Game extends AbstractModel implements ActionListener {
         }
 
         /**
-         * Converts player name to player number
+         * Converts player name to player number.
          *
-         * @param player
-         * @return
+         * @param player the player
+         * @return the int
          */
         public int playerToInt(String player) {
             if (player.equals(STARTING_PLAYER)) {
@@ -111,7 +124,10 @@ public class Game extends AbstractModel implements ActionListener {
         }
 
         /**
-         * Converts player number to player name
+         * Converts player number to player name.
+         *
+         * @param nr the nr
+         * @return the string
          */
         public String playerToString(int nr) {
             switch (nr) {
@@ -124,17 +140,30 @@ public class Game extends AbstractModel implements ActionListener {
             }
         }
 
+        /**
+         * Checks if is client.
+         *
+         * @param player the player
+         * @return true, if is client
+         */
         //Checks if given player is the client
         public boolean isClient(String player) {
             return player.equals(CLIENT);
         }
 
+        /**
+         * Gets the current player.
+         *
+         * @return the current player
+         */
         public int getCurrentPlayer() {
             return currentPlayer;
         }
 
         /**
-         * Checks if client is current player
+         * Checks if client is current player.
+         *
+         * @return true, if is client turn
          */
         private boolean isClientTurn() {
 
@@ -147,9 +176,9 @@ public class Game extends AbstractModel implements ActionListener {
 
 
         /**
-         * Sets whether the Client goes first or second
+         * Sets whether the Client goes first or second.
          *
-         * @param clientStarts
+         * @param clientStarts the new client starts
          */
         void setClientStarts(boolean clientStarts) {
             if (clientStarts) {
@@ -167,8 +196,8 @@ public class Game extends AbstractModel implements ActionListener {
      * Executes a move to the given Point on the Board
      * Checks for validity move.
      *
-     * @param location
-     * @throws IllegalStateException
+     * @param location the location
+     * @throws IllegalStateException the illegal state exception
      */
     private void doMove(Point location) throws IllegalStateException {
         if (board.doMove(location, playerState.currentPlayer)) {
@@ -180,9 +209,9 @@ public class Game extends AbstractModel implements ActionListener {
 
     /**
      * Additive to doMove(Point location)
-     * Transforms Board location from integer (0-BOARD_LENGTH^2) to Point(x,y)
+     * Transforms Board location from integer (0-BOARD_LENGTH^2) to Point(x,y).
      *
-     * @param location
+     * @param location the location
      */
     public void doMove(int location) {
         doMove(intToPoint(location));
@@ -191,8 +220,8 @@ public class Game extends AbstractModel implements ActionListener {
     /**
      * Checks if move is valid.
      *
-     * @param location
-     * @return
+     * @param location the location
+     * @return true, if is valid move
      */
     public boolean isValidMove(Point location) {
         return board.isValidMove(location, playerState.currentPlayer);
@@ -201,7 +230,7 @@ public class Game extends AbstractModel implements ActionListener {
     /**
      * Sets if the Client has the first turn, then prepares it.
      *
-     * @param clientBegins
+     * @param clientBegins the new client begins
      */
     public void setClientBegins(boolean clientBegins) {
         playerState.setClientStarts(clientBegins);
@@ -211,12 +240,17 @@ public class Game extends AbstractModel implements ActionListener {
     }
 
 
+    /**
+     * Checks if is clients turn.
+     *
+     * @return true, if is clients turn
+     */
     public boolean isClientsTurn() {
         return playerState.isClientTurn();
     }
 
     /**
-     * Enables buttons for Client
+     * Enables buttons for Client.
      */
     private void doClientTurn() {
         fire(new ActionEvent(this, AbstractModel.TURN_START, "CLIENT IS ON SET"));
@@ -226,7 +260,7 @@ public class Game extends AbstractModel implements ActionListener {
     /**
      * adds ActionListener to the list.
      *
-     * @param listener
+     * @param listener the listener
      */
     public void addActionListener(ActionListener listener) {
         listeners.add(listener);
@@ -235,7 +269,7 @@ public class Game extends AbstractModel implements ActionListener {
     /**
      * Fires event to all subscribed listeners.
      *
-     * @param event
+     * @param event the event
      */
     public void fire(ActionEvent event) {
         listeners.forEach(listener -> listener.actionPerformed(event));
@@ -243,7 +277,7 @@ public class Game extends AbstractModel implements ActionListener {
 
 
     /**
-     * Converts the location from an Integer into a Point(x,y)
+     * Converts the location from an Integer into a Point(x,y).
      *
      * @param location the location to convert
      * @return the converted location
@@ -253,7 +287,7 @@ public class Game extends AbstractModel implements ActionListener {
     }
 
     /**
-     * Converts the location from a Point(x,y) into an Integer
+     * Converts the location from a Point(x,y) into an Integer.
      *
      * @param point the location to convert
      * @return the converted location
@@ -263,7 +297,7 @@ public class Game extends AbstractModel implements ActionListener {
     }
 
     /**
-     * Ends the player's turn
+     * Ends the player's turn.
      */
     public void endTurn() {
         //changes current player
@@ -281,7 +315,7 @@ public class Game extends AbstractModel implements ActionListener {
     }
 
     /**
-     * Starts the next turn
+     * Starts the next turn.
      */
     public void turnStart() {
         if (playerState.isClientTurn()) {
@@ -290,7 +324,7 @@ public class Game extends AbstractModel implements ActionListener {
     }
 
     /**
-     * Sets the Board up for a standarized games
+     * Sets the Board up for a standarized games.
      */
     public void prepareStandardGame() {
         fireEvents=true;
@@ -301,7 +335,7 @@ public class Game extends AbstractModel implements ActionListener {
 
     /**
      * returns all valid moves at this point for the current player
-     * Inherited from AbstractModel
+     * Inherited from AbstractModel.
      *
      * @return Array with all valid locations
      */
@@ -317,7 +351,7 @@ public class Game extends AbstractModel implements ActionListener {
      * returns the location where the most recent piece is placed.
      * Inherited from AbstractModel
      *
-     * @return
+     * @return the sets the location
      */
     @Override
     public int getSetLocation() {
@@ -328,7 +362,7 @@ public class Game extends AbstractModel implements ActionListener {
      * Returns the player who did the most recent move.
      * Inherited from AbstractModel
      *
-     * @return
+     * @return the side
      */
     @Override
     public int getSide() {
@@ -336,55 +370,55 @@ public class Game extends AbstractModel implements ActionListener {
     }
 
     /**
-     * Checks for the end of the match
+     * Checks for the end of the match.
      *
-     * @return
+     * @return true, if successful
      */
     public boolean checkIfMatchDone() {
         return (board.getPossibleMoves(1).length == 0 && board.getPossibleMoves(2).length == 0);
     }
 
     /**
-     * Returns the given players score
+     * Returns the given players score.
      *
-     * @param player
-     * @return
+     * @param player the player
+     * @return the score
      */
     public int getScore(String player) {
         return board.getOccurrences(playerState.playerToInt(player));
     }
 
     /**
-     * Returns the current player
+     * Returns the current player.
      *
-     * @return
+     * @return the current player
      */
     public String getCurrentPlayer() {
         return playerState.playerToString(playerState.currentPlayer);
     }
 
     /**
-     * returns the Client player
+     * returns the Client player.
      *
-     * @return
+     * @return the client
      */
     public int getClient() {
         return playerState.playerToInt(playerState.CLIENT);
     }
 
     /**
-     * returns the opposing player
+     * returns the opposing player.
      *
-     * @return
+     * @return the opponent
      */
     public int getOpponent() {
         return playerState.playerToInt(playerState.OPPONENT);
     }
 
     /**
-     * Returns the Board in string form
+     * Returns the Board in string form.
      *
-     * @return
+     * @return the string
      */
     @Override
     public String toString() {
@@ -394,7 +428,7 @@ public class Game extends AbstractModel implements ActionListener {
     /**
      * Returns the Board.
      *
-     * @return
+     * @return the board
      */
     public Board getBoard() {
         return this.board;

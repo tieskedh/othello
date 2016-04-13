@@ -7,8 +7,9 @@ import othello.Game;
 import java.awt.*;
 import java.io.InputStream;
 
+
 /**
- * Created by Laurens on 10-4-2016.
+ * The Class NeuralAI.
  */
 public class NeuralAI {
 
@@ -17,6 +18,14 @@ public class NeuralAI {
     private Network network;
     private Game game;
 
+    /**
+     * Instantiates a new neural ai.
+     *
+     * @param side the side
+     * @param opponent the opponent
+     * @param networkStream the network stream
+     * @param game the game
+     */
     public NeuralAI(int side, int opponent, InputStream networkStream, Game game) {
         this.side = side;
         this.opponent = opponent;
@@ -24,6 +33,11 @@ public class NeuralAI {
         this.game = game;
     }
 
+    /**
+     * Gets the network move.
+     *
+     * @return the network move
+     */
     public int getNetworkMove(){
         Point[] possibleMoves = game.getBoard().getPossibleMoves(side);
         float[] ratings = getRatings(game.getBoard(),network);
@@ -39,6 +53,13 @@ public class NeuralAI {
         return move;
     }
 
+    /**
+     * Gets the ratings.
+     *
+     * @param board the board
+     * @param network the network
+     * @return the ratings
+     */
     private float[] getRatings(Board board, Network network){
         int[][] pieces = board.getBoardPieces();
         int count = 0;
@@ -53,6 +74,12 @@ public class NeuralAI {
     }
 
 
+    /**
+     * Point to int.
+     *
+     * @param point the point
+     * @return the int
+     */
     private int pointToInt(Point point) {
         return point.x * 8 + point.y;
     }

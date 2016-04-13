@@ -2,7 +2,6 @@ package othello.gui;
 
 /**
  * This class defines the data the model needs to provide
- * Created by thijs on 24-3-2016.
  */
 public abstract class AbstractModel {
 

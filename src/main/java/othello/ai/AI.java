@@ -1,8 +1,15 @@
 package othello.ai;
 
+
 /**
- * Created by thijs on 9-4-2016.
+ * The Interface AI.
  */
 public interface AI {
+    
+    /**
+     * Gets the move.
+     *
+     * @return the move
+     */
     public String getMove();
 }

@@ -7,8 +7,9 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+
 /**
- * Created by thijs on 11-4-2016.
+ * The Class UnflippablePieceSingularEvaluator.
  */
 public class UnflippablePieceSingularEvaluator implements Evaluator, ActionListener, MaxDepthEvaluator{
     int[][] stability;
@@ -16,6 +17,12 @@ public class UnflippablePieceSingularEvaluator implements Evaluator, ActionListe
 
     Board board;
 
+    /**
+     * Instantiates a new unflippable piece singular evaluator.
+     *
+     * @param board the board
+     * @param shouldEvaluate the should evaluate
+     */
     public UnflippablePieceSingularEvaluator(Board board, boolean shouldEvaluate) {
         this.board = board;
         board.addActionListener(this);
@@ -25,14 +32,25 @@ public class UnflippablePieceSingularEvaluator implements Evaluator, ActionListe
         }
     }
 
+    /**
+     * Evaluate.
+     */
     private void evaluate() {
         board.forEach((point, integer) -> setAtLocation(point, 0));
     }
 
+    /**
+     * Instantiates a new unflippable piece singular evaluator.
+     *
+     * @param board the board
+     */
     public UnflippablePieceSingularEvaluator(Board board) {
         this(board, true);
     }
 
+    /**
+     * Prepare.
+     */
     public void prepare() {
         stability = new int[6][8];
         for(int direction = 0; direction < 2; direction++) {
@@ -47,6 +65,12 @@ public class UnflippablePieceSingularEvaluator implements Evaluator, ActionListe
         }
     }
 
+    /**
+     * Sets the at location.
+     *
+     * @param location the location
+     * @param player the player
+     */
     protected void setAtLocation(Point location, int player) {
         if(board.getAtLocation(location) != player) {
 
@@ -75,12 +99,21 @@ public class UnflippablePieceSingularEvaluator implements Evaluator, ActionListe
     }
 
 
+    /* (non-Javadoc)
+     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         Move move = ((Board)e.getSource()).getLastMove();
         setAtLocation(move.getPoint(), move.player);
     }
 
+    /**
+     * Checks if is locked.
+     *
+     * @param location the location
+     * @return true, if is locked
+     */
     private boolean isLocked(Point location) {
         if(! (stability[0][location.x] == 0 && stability[1][location.y] ==0))
             return false;
@@ -107,6 +140,9 @@ public class UnflippablePieceSingularEvaluator implements Evaluator, ActionListe
         }
     }
 
+    /* (non-Javadoc)
+     * @see othello.ai.botwork.evaluators.Evaluator#getScore(othello.Board, int, java.awt.Point)
+     */
     @Override
     public int getScore(Board board, int side, Point move) {
         System.out.println(board);
@@ -114,6 +150,9 @@ public class UnflippablePieceSingularEvaluator implements Evaluator, ActionListe
         return isLocked(move)?1:0;
     }
 
+    /* (non-Javadoc)
+     * @see othello.ai.botwork.evaluators.MaxDepthEvaluator#getMaxDepth()
+     */
     @Override
     public int getMaxDepth() {
         return 1;

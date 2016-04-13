@@ -6,16 +6,26 @@ import othello.utility.WeightedMove;
 
 import java.awt.*;
 
+
 /**
- * Created by thijs on 11-4-2016.
+ * The Class MiniMaxAI.
  */
 public class MiniMaxAI extends Algorithm {
 
 
+    /**
+     * Instantiates a new minimax ai.
+     *
+     * @param game the game
+     * @param depth the depth
+     */
     public MiniMaxAI(Game game, int depth) {
         super(depth, game);
     }
 
+    /* (non-Javadoc)
+     * @see othello.ai.botwork.algorithms.Algorithm#evaluate(othello.Board, int, int, java.awt.Point)
+     */
     public WeightedMove evaluate(Board board, int side, int depth, Point move) {
         //new board
         Board tempBoard = new Board(board);

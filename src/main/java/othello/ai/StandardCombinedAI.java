@@ -8,6 +8,9 @@ import othello.Board;
 import othello.Game;
 import othello.ai.AI;
 
+/**
+ * The Class StandardCombinedAI which implements a Greedy and a Minimax algorithm.
+ */
 public class StandardCombinedAI implements AI {
     private static final int[] RATING_THIRTY = { 0, 7, 56, 63 };
     private static final int[] RATING_TEN = { 2, 5, 16, 23, 40, 47, 58, 61 };
@@ -22,11 +25,19 @@ public class StandardCombinedAI implements AI {
     private HashMap<Integer, Integer> positionRating = new HashMap<>();
     private Game game;
 
+    /**
+     * Instantiates a new standard combined ai.
+     *
+     * @param game the game
+     */
     public StandardCombinedAI(Game game) {
         this.game = game;
         buildPositionsRating();
     }
 
+    /* (non-Javadoc)
+     * @see othello.ai.AI#getMove()
+     */
     @Override
     public String getMove() {
         Board board = game.getBoard();
@@ -44,6 +55,12 @@ public class StandardCombinedAI implements AI {
         return Integer.toString(move);
     }
 
+    /**
+     * Gets the best greedy move.
+     *
+     * @param board the board
+     * @return the best greedy move
+     */
     private int getBestGreedyMove(Board board) {
         int[][] boardPieces = Arrays.copyOf(board.getBoardPieces(), board.getBoardPieces().length);
 
@@ -81,6 +98,13 @@ public class StandardCombinedAI implements AI {
         return move;
     }
 
+    /**
+     * Gets the next player.
+     *
+     * @param board the board
+     * @param currentPlayer the current player
+     * @return the next player
+     */
     private int getNextPlayer(Board board, int currentPlayer) {
         if (board.getPossibleMoves(3 - currentPlayer).length == 0) {
             if (board.getPossibleMoves(currentPlayer).length == 0) {
@@ -93,6 +117,15 @@ public class StandardCombinedAI implements AI {
         }
     }
 
+    /**
+     * Gets the best mini max move.
+     *
+     * @param board the board
+     * @param depth the depth
+     * @param client the client
+     * @param currentPlayer the current player
+     * @return the best mini max move
+     */
     private int[] getBestMiniMaxMove(Board board, int depth, int client, int currentPlayer) {
         int currentScore;
         int bestScore = (currentPlayer == client) ? Integer.MIN_VALUE : Integer.MAX_VALUE;
@@ -131,6 +164,15 @@ public class StandardCombinedAI implements AI {
         return new int[] { bestScore, bestMove };
     }
 
+    /**
+     * Gets the score of a move.
+     *
+     * @param board the current board
+     * @param point the point on the board that just has been set
+     * @param player the current player
+     * @param opponent the opponent
+     * @return the score
+     */
     private int getScore(Board board, Point point, int player, int opponent) {
         int[][] boardPieces = board.getBoardPieces();
         int[][] oldBoardPieces = new int[8][8];
@@ -164,6 +206,9 @@ public class StandardCombinedAI implements AI {
         return score;
     }
 
+    /**
+     * Builds the positions rating.
+     */
     private void buildPositionsRating(){
         for (int i = 0; i < StandardCombinedAI.RATING_THIRTY.length; i++) {
             positionRating.put(StandardCombinedAI.RATING_THIRTY[i], 30);

@@ -12,8 +12,9 @@ import java.util.Collection;
 import java.util.function.BiConsumer;
 import java.util.stream.IntStream;
 
+
 /**
- * Created by thijs on 3-4-2016.
+ * The Class Board.
  */
 public class Board {
     /**
@@ -38,7 +39,7 @@ public class Board {
 
 
     /**
-     * Creates a board by the given size
+     * Creates a board by the given size.
      *
      * @param boardSize the size of a side of the board
      */
@@ -47,6 +48,11 @@ public class Board {
         board = new int[BOARD_SIZE][BOARD_SIZE];
     }
 
+    /**
+     * Instantiates a new board.
+     *
+     * @param board the board
+     */
     public Board(Board board) {
         int[][] pieces = board.getBoardPieces();
         BOARD_SIZE = pieces.length;
@@ -58,7 +64,7 @@ public class Board {
     }
 
     /**
-     * place a move on the board
+     * place a move on the board.
      *
      * @param location the location where to place the move
      * @param player   the player which places the move
@@ -73,6 +79,11 @@ public class Board {
         }
     }
 
+    /**
+     * For each.
+     *
+     * @param consumer the consumer
+     */
     public void forEach(BiConsumer<Point, Integer> consumer) {
         Point point;
         for(int x = 0; x < BOARD_SIZE; x++) {
@@ -101,7 +112,7 @@ public class Board {
     }
 
     /**
-     * Returns the value of the given location
+     * Returns the value of the given location.
      *
      * @param location the value where to get the value from
      * @return the value of the field specified by location
@@ -122,7 +133,7 @@ public class Board {
     }
 
     /**
-     * Sets the value of the given location
+     * Sets the value of the given location.
      *
      * @param location The location where to set the value from
      * @param player   the player which needs to be placed at the given location
@@ -133,16 +144,26 @@ public class Board {
         fire(new ActionEvent(this, AbstractModel.PLACE_PIECE, "PIECE PLACED"));
     }
 
+    /**
+     * Fire.
+     *
+     * @param event the event
+     */
     private void fire(ActionEvent event) {
         actionListeners.forEach(listener -> listener.actionPerformed(event));
     }
 
+    /**
+     * Adds the action listener.
+     *
+     * @param actionListener the action listener
+     */
     public void addActionListener(ActionListener actionListener) {
         actionListeners.add(actionListener);
     }
 
     /**
-     * Counts the occurrence of the given player on the board
+     * Counts the occurrence of the given player on the board.
      *
      * @param player the player to count the pieces from
      * @return the occurrence of the player
@@ -155,7 +176,7 @@ public class Board {
     }
 
     /**
-     * Clears the board
+     * Clears the board.
      */
     public void clear() {
         board = new int[BOARD_SIZE][BOARD_SIZE];
@@ -175,7 +196,7 @@ public class Board {
 
     /**
      * Prepares a 4 by 4 game for testing
-     * todo remove this method after testing
+     * todo remove this method after testing.
      */
     public void prepareTestGame() {
         setAtLocation(new Point(1, 1), PLAYER_1);
@@ -212,7 +233,7 @@ public class Board {
     }
 
     /**
-     * checks if a location is out of bounds
+     * checks if a location is out of bounds.
      *
      * @param location the location to check
      * @return the location is outside the board
@@ -223,7 +244,7 @@ public class Board {
     }
 
     /**
-     * Returns the possible moves of a player
+     * Returns the possible moves of a player.
      *
      * @param player the player to get the moves from
      * @return the possible moves
@@ -255,10 +276,18 @@ public class Board {
                 .anyMatch(list -> !list.isEmpty());
     }
 
+    /**
+     * Gets the size.
+     *
+     * @return the size
+     */
     public int getSize() {
         return BOARD_SIZE;
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -273,14 +302,19 @@ public class Board {
     }
 
 
+    /**
+     * Gets the last move.
+     *
+     * @return the last move
+     */
     public Move getLastMove() {
         return lastMove;
     }
 
     /**
-     * Sets up the board for the AI player
+     * Sets up the board for the AI player.
      *
-     * @param boardPieces
+     * @param boardPieces the new board pieces
      */
     public void setBoardPieces(int[][] boardPieces) {
         int[][] newBoardPieces = new int[8][8];
@@ -291,6 +325,11 @@ public class Board {
     }
 
 
+    /**
+     * Gets the board pieces.
+     *
+     * @return the board pieces
+     */
     public int[][] getBoardPieces() {
         int[][] newBoardPieces = new int[8][8];
         for (int i = 0; i < board.length; i++) {
@@ -301,6 +340,11 @@ public class Board {
         return newBoardPieces;
     }
 
+    /**
+     * Gets the empty spaces.
+     *
+     * @return the empty spaces
+     */
     public int getEmptySpaces(){
         int spaces = 0;
 
@@ -313,6 +357,11 @@ public class Board {
         return spaces;
     }
 
+    /**
+     * Removes the action listener.
+     *
+     * @param listener the listener
+     */
     public void removeActionListener(ActionListener listener) {
         actionListeners.remove(listener);
     }

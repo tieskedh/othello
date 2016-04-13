@@ -14,6 +14,9 @@ import othello.ai.AI;
 import othello.ai.StandardCombinedAI;
 import othello.gui.GameView;
 
+/**
+ * The Class GameModule.
+ */
 public class GameModule extends ClientAbstractGameModule implements ActionListener {
     private static final int BOARD_SIZE = 8;
     private GameView gameView;
@@ -56,6 +59,9 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
         gameView.addActionListener(this);
     }
 
+    /* (non-Javadoc)
+     * @see nl.hanze.t23i.gamemodule.extern.IGameModule#getView()
+     */
     @Override
     public Component getView() {
         return gameView;
@@ -65,7 +71,7 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
      * Sends action to all MoveListeners.
      * currently contains only the Framework.
      *
-     * @param e
+     * @param e the e
      */
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -76,6 +82,9 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
         }
     }
 
+    /* (non-Javadoc)
+     * @see nl.hanze.t23i.gamemodule.extern.AbstractGameModule#doPlayerMove(java.lang.String, java.lang.String)
+     */
     @Override
     public void doPlayerMove(String player, String move) throws IllegalStateException {
         game.fireEvents(true);
@@ -116,6 +125,9 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
         }
     }
 
+    /* (non-Javadoc)
+     * @see nl.hanze.t23i.gamemodule.extern.AbstractGameModule#getPlayerScore(java.lang.String)
+     */
     @Override
     public int getPlayerScore(String player) throws IllegalStateException {
         if (matchStatus != MATCH_FINISHED) {
@@ -124,6 +136,9 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
         return game.getScore(player);
     }
 
+    /* (non-Javadoc)
+     * @see nl.hanze.t23i.gamemodule.extern.AbstractGameModule#getMatchResultComment()
+     */
     @Override
     public String getMatchResultComment() throws IllegalStateException {
         if (matchStatus != MATCH_FINISHED) {
@@ -132,11 +147,17 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
         return "The match has come to an end.";
     }
 
+    /* (non-Javadoc)
+     * @see nl.hanze.t23i.gamemodule.extern.AbstractGameModule#getMatchStatus()
+     */
     @Override
     public int getMatchStatus() {
         return matchStatus;
     }
 
+    /* (non-Javadoc)
+     * @see nl.hanze.t23i.gamemodule.extern.AbstractGameModule#getMoveDetails()
+     */
     @Override
     public String getMoveDetails() throws IllegalStateException {
         if (matchStatus == MATCH_INITIALIZED) {
@@ -149,6 +170,9 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
         return moveDetails;
     }
 
+    /* (non-Javadoc)
+     * @see nl.hanze.t23i.gamemodule.extern.AbstractGameModule#getPlayerToMove()
+     */
     @Override
     public String getPlayerToMove() throws IllegalStateException {
         if (matchStatus != MATCH_STARTED) {
@@ -157,6 +181,9 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
         return game.getCurrentPlayer();
     }
 
+    /* (non-Javadoc)
+     * @see nl.hanze.t23i.gamemodule.extern.AbstractGameModule#getPlayerResult(java.lang.String)
+     */
     @Override
     public int getPlayerResult(String player) throws IllegalStateException {
         if (matchStatus != MATCH_FINISHED) {
@@ -165,6 +192,9 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
         return playerResults.get(player);
     }
 
+    /* (non-Javadoc)
+     * @see nl.hanze.t23i.gamemodule.extern.AbstractGameModule#getTurnMessage()
+     */
     @Override
     public String getTurnMessage() throws IllegalStateException {
         if (matchStatus != MATCH_STARTED) {
@@ -173,6 +203,9 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
         return (moveDetails == null) ? "Place your piece." : moveDetails;
     }
 
+    /* (non-Javadoc)
+     * @see nl.abstractteam.gamemodule.ClientAbstractGameModule#setClientBegins(boolean)
+     */
     // called 1st
     @Override
     public void setClientBegins(boolean clientBegins) {
@@ -180,6 +213,9 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
         ai = new StandardCombinedAI(game);
     }
 
+    /* (non-Javadoc)
+     * @see nl.abstractteam.gamemodule.ClientAbstractGameModule#setClientPlayPiece(java.lang.String)
+     */
     //called 2nd
     @Override
     public void setClientPlayPiece(String s) {
@@ -204,13 +240,16 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
      * If the Client is set as an AI, the Framework will use this method to acquire its move, instead of using a View Event
      * Inherited from ClientAbstractGameModule.
      *
-     * @return
+     * @return the AI move
      */
     @Override // TODO: 4-4-2016 implement
     public String getAIMove() {
         return ai.getMove();
     }
 
+    /* (non-Javadoc)
+     * @see nl.hanze.t23i.gamemodule.extern.AbstractGameModule#start()
+     */
     //called 3rd
     @Override
     public void start() throws IllegalStateException {
@@ -220,10 +259,19 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
 
     }
 
+    /**
+     * Other player.
+     *
+     * @param player the player
+     * @return the string
+     */
     private String otherPlayer(String player) {
         return player.equals(playerOne) ? playerTwo : playerOne;
     }
 
+    /* (non-Javadoc)
+     * @see nl.abstractteam.gamemodule.ClientAbstractGameModule#addMoveListener(nl.abstractteam.gamemodule.MoveListener)
+     */
     public void addMoveListener(MoveListener movelistener) {
         moveListeners.add(movelistener);
     }

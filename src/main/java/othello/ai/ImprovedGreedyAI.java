@@ -6,6 +6,9 @@ import java.util.HashMap;
 import othello.Board;
 import othello.Game;
 
+/**
+ * The Class ImprovedGreedyAI.
+ */
 public class ImprovedGreedyAI implements AI{
 	private static final int[] RATING_THIRTY = { 0, 7, 56, 63 };
 	private static final int[] RATING_TEN = { 2, 5, 16, 23, 40, 47, 58, 61 };
@@ -20,11 +23,19 @@ public class ImprovedGreedyAI implements AI{
 	private Game game;
 	private HashMap<Integer, Integer> positionRating = new HashMap<>();
 
+	/**
+	 * Instantiates a new improved greedy ai.
+	 *
+	 * @param game the game
+	 */
 	public ImprovedGreedyAI(Game game) {
 		this.game = game;
 		buildPositionsRating();
 	}
 
+	/* (non-Javadoc)
+	 * @see othello.ai.AI#getMove()
+	 */
 	@Override
 	public String getMove() {
 		Board board = game.getBoard();
@@ -37,6 +48,12 @@ public class ImprovedGreedyAI implements AI{
 		return "" + move;
 	}
 
+	/**
+	 * Gets the best greedy move.
+	 *
+	 * @param board the board
+	 * @return the best greedy move
+	 */
 	private int getBestGreedyMove(Board board){
 		int[][] boardPieces = Arrays.copyOf(board.getBoardPieces(), board.getBoardPieces().length);
 
@@ -74,6 +91,15 @@ public class ImprovedGreedyAI implements AI{
 		return move;
 	}
 
+	/**
+	 * Gets the score.
+	 *
+	 * @param board the board
+	 * @param point the point
+	 * @param player the player
+	 * @param opponent the opponent
+	 * @return the score
+	 */
 	private int getScore(Board board, Point point, int player, int opponent) {
 		int[][] boardPieces = board.getBoardPieces();
 		int[][] oldBoardPieces = new int[8][8];
@@ -107,6 +133,9 @@ public class ImprovedGreedyAI implements AI{
 		return score;
 	}
 
+	/**
+	 * Builds the positions rating.
+	 */
 	private void buildPositionsRating(){
 		for (int i = 0; i < ImprovedGreedyAI.RATING_THIRTY.length; i++) {
 			positionRating.put(ImprovedGreedyAI.RATING_THIRTY[i], 30);

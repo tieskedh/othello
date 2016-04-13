@@ -4,10 +4,15 @@ import othello.Board;
 
 import java.awt.*;
 
+
 /**
- * Created by thijs on 12-4-2016.
+ * The Class WallCountEvaluator.
  */
 public class WallCountEvaluator implements Evaluator{
+    
+    /* (non-Javadoc)
+     * @see othello.ai.botwork.evaluators.Evaluator#getScore(othello.Board, int, java.awt.Point)
+     */
     @Override
     public int getScore(Board board, int side, Point move) {
         int[][] pieces = board.getBoardPieces();

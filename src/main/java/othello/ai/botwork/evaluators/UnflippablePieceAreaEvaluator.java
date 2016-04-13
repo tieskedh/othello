@@ -9,8 +9,9 @@ import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.stream.IntStream;
 
+
 /**
- * Created by Gebruiker on 12/04/2016.
+ * The Class UnflippablePieceAreaEvaluator.
  */
 public class UnflippablePieceAreaEvaluator implements ActionListener, MaxDepthEvaluator {
     private static final int PLAYER_ONE = 1;
@@ -18,6 +19,11 @@ public class UnflippablePieceAreaEvaluator implements ActionListener, MaxDepthEv
     private boolean[][] stablePieceArrayPlayerOne = new boolean[10][10];
     private boolean[][] stablePieceArrayPlayerTwo = new boolean[10][10];
 
+    /**
+     * Instantiates a new unflippable piece area evaluator.
+     *
+     * @param board the board
+     */
     public UnflippablePieceAreaEvaluator(Board board) {
         board.addActionListener(this);
 
@@ -31,6 +37,12 @@ public class UnflippablePieceAreaEvaluator implements ActionListener, MaxDepthEv
         }
     }
 
+    /**
+     * Sets the stable.
+     *
+     * @param location the location
+     * @param player the player
+     */
     private void setStable(Point location, int player)  {
         if(player==1) {
             stablePieceArrayPlayerOne[location.x+1][location.y+1] = true;
@@ -47,6 +59,13 @@ public class UnflippablePieceAreaEvaluator implements ActionListener, MaxDepthEv
     }
 
 
+    /**
+     * Determine if stable.
+     *
+     * @param location the location
+     * @param player the player
+     * @return true, if successful
+     */
     boolean determineIfStable(Point location, int player) {
         int totalvalue = 0;
 
@@ -89,6 +108,16 @@ public class UnflippablePieceAreaEvaluator implements ActionListener, MaxDepthEv
     }
 
 
+    /**
+     * Count stable sequence.
+     *
+     * @param location the location
+     * @param xOffset the x offset
+     * @param yOffset the y offset
+     * @param totalvalue the totalvalue
+     * @param player the player
+     * @return the int
+     */
     int countStableSequence(Point location, int xOffset, int yOffset, int totalvalue, int player) {
         Point testLocation = new Point(location.x + xOffset, location.y + yOffset);
 
@@ -99,6 +128,13 @@ public class UnflippablePieceAreaEvaluator implements ActionListener, MaxDepthEv
         }
     }
 
+    /**
+     * Checks if is stable.
+     *
+     * @param location the location
+     * @param player the player
+     * @return true, if is stable
+     */
     boolean isStable(Point location, int player) {
         if (player == PLAYER_ONE) {
             return stablePieceArrayPlayerOne[location.x+1][location.y+1];
@@ -107,6 +143,9 @@ public class UnflippablePieceAreaEvaluator implements ActionListener, MaxDepthEv
         }
     }
 
+    /* (non-Javadoc)
+     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         Board board = ((Board)e.getSource());
@@ -116,6 +155,9 @@ public class UnflippablePieceAreaEvaluator implements ActionListener, MaxDepthEv
         }
     }
 
+    /* (non-Javadoc)
+     * @see othello.ai.botwork.evaluators.Evaluator#getScore(othello.Board, int, java.awt.Point)
+     */
     @Override
     public int getScore(Board board, int side, Point move) {
 
@@ -130,6 +172,9 @@ public class UnflippablePieceAreaEvaluator implements ActionListener, MaxDepthEv
         return score-opponentScore*4;
     }
 
+    /* (non-Javadoc)
+     * @see othello.ai.botwork.evaluators.MaxDepthEvaluator#getMaxDepth()
+     */
     @Override
     public int getMaxDepth() {
         return 1;

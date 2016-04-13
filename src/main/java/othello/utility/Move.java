@@ -1,9 +1,5 @@
 package othello.utility;
 
-/**
- * Created by thijs on 9-4-2016.
- */
-
 import java.awt.*;
 
 /**

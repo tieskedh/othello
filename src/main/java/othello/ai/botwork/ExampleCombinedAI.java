@@ -5,8 +5,10 @@ import othello.Game;
 import othello.ai.AI;
 import othello.ai.botwork.evaluators.*;
 import othello.ai.botwork.algorithms.*;
+
+
 /**
- * Created by thijs on 11-4-2016.
+ * The Class ExampleCombinedAI.
  */
 public class ExampleCombinedAI implements AI {
 
@@ -21,6 +23,12 @@ public class ExampleCombinedAI implements AI {
     private final PieceCountEvaluator pieceCountEvaluator;
     private final FixedFieldScoreEvaluator fixedFieldScoreEvaluator;
     private final WallCountEvaluator wallCountEvaluator;
+    
+    /**
+     * Instantiates a new example combined ai.
+     *
+     * @param game the game
+     */
     public ExampleCombinedAI(Game game) {
         this.game = game;
         board = game.getBoard();
@@ -40,6 +48,9 @@ public class ExampleCombinedAI implements AI {
     private boolean thirdFase;
     private boolean fourthFase;
 
+    /* (non-Javadoc)
+     * @see othello.ai.AI#getMove()
+     */
     @Override
     public String getMove() {
         int emptySpaces = board.getEmptySpaces();
