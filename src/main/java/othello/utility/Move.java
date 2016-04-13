@@ -14,7 +14,7 @@ import java.awt.*;
 public class Move {
     public static final int BOARD_SIZE = 8;
     public final int player;
-    public final int location;
+    public int location;
 
     /**
      * Constructor for Move class
@@ -29,7 +29,7 @@ public class Move {
 
     public Move(int player, Point location) {
         this.player = player;
-        this.location = location.x * BOARD_SIZE + location.y;
+        setLocation(location);
     }
 
     public int getX() {
@@ -53,6 +53,12 @@ public class Move {
 
     public Point getPoint() {
         return new Point(getX(), getY());
+    }
+
+    public Move setLocation(Point location) {
+        if(location==null) System.out.println("loc = null");
+        this.location = location.x * BOARD_SIZE + location.y;
+        return this;
     }
 }
 

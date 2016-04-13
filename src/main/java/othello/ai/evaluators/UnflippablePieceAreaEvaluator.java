@@ -1,23 +1,53 @@
 package othello.ai.evaluators;
 
 import othello.Board;
+import othello.utility.Move;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Arrays;
+import java.util.stream.IntStream;
+
+import static othello.utility.Move.BOARD_SIZE;
 
 /**
  * Created by Gebruiker on 12/04/2016.
  */
-public class UnflippablePieceAreaEvaluator extends MiniMaxEvaluator implements Evaluator, ActionListener {
+public class UnflippablePieceAreaEvaluator implements Evaluator, ActionListener {
     private static final int PLAYER_ONE = 1;
     private static final int PLAYER_TWO = 2;
-    private boolean[][] stablePieceArrayPlayerOne;
-    private boolean[][] stablePieceArrayPlayerTwo;
+    private boolean[][] stablePieceArrayPlayerOne = new boolean[10][10];
+    private boolean[][] stablePieceArrayPlayerTwo = new boolean[10][10];
 
-    UnflippablePieceAreaEvaluator(int maxDepth) {
-        super(maxDepth);
+    public UnflippablePieceAreaEvaluator(Board board) {
+        board.addActionListener(this);
+
+        for(int i= 0; i  < 10; i++) {
+            for(int j = 0; j < 10; j++) {
+                if(i == 0 || i == 9 || j == 0 || j == 9) {
+                    stablePieceArrayPlayerOne[i][j] = true;
+                    stablePieceArrayPlayerTwo[i][j] = true;
+                }
+            }
+        }
     }
+
+    private void setStable(Point location, int player)  {
+        if(player==1) {
+            stablePieceArrayPlayerOne[location.x+1][location.y+1] = true;
+        } else {
+            stablePieceArrayPlayerTwo[location.x+1][location.y+1] = true;
+        }
+
+        IntStream.range(0, 9)
+                .filter(nr->nr!=4)
+                .filter(nr -> countStableSequence(location, nr/3-1, nr%3-1, 1, player)>=4)
+                .mapToObj(nr -> new Point(location.x+nr/3-1, location.y+nr%3-1))
+                .filter(point -> determineIfStable(point, player))
+                .forEach(point -> setStable(point, player));
+    }
+
 
     boolean determineIfStable(Point location, int player) {
         int totalvalue = 0;
@@ -65,7 +95,7 @@ public class UnflippablePieceAreaEvaluator extends MiniMaxEvaluator implements E
         Point testLocation = new Point(location.x + xOffset, location.y + yOffset);
 
         if (isStable(testLocation, player)) {
-            return totalvalue++;
+            return ++totalvalue;
         } else {
             return 0;
         }
@@ -73,19 +103,25 @@ public class UnflippablePieceAreaEvaluator extends MiniMaxEvaluator implements E
 
     boolean isStable(Point location, int player) {
         if (player == PLAYER_ONE) {
-            return stablePieceArrayPlayerOne[location.x][location.y] == true;
+            return stablePieceArrayPlayerOne[location.x+1][location.y+1];
         } else {
-            return stablePieceArrayPlayerTwo[location.x][location.y] == true;
+            return stablePieceArrayPlayerTwo[location.x+1][location.y+1];
         }
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-
+        Board board = ((Board)e.getSource());
+        Move move = board.getLastMove();
+        if(determineIfStable(move.getPoint(), move.player)) {
+            setStable(move.getPoint(), move.player);
+        }
     }
 
     @Override
     public int getScore(Board board, int side, Point move) {
-        return determineIfStable(move, side) ? 1 : 0;
+        int score = determineIfStable(move, side) ? 1 : 0;
+        int opponentScore = determineIfStable(move, 1-side)?1:0;
+        return score;
     }
 }

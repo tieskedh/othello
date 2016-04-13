@@ -2,8 +2,7 @@ package othello.ai;
 
 import othello.Board;
 import othello.Game;
-import othello.ai.evaluators.UnflippablePieceSingularEvaluator;
-import othello.ai.evaluators.PossibleMoveEvaluator;
+import othello.ai.evaluators.*;
 import othello.ai.minimax.MiniMaxAI;
 
 /**
@@ -11,20 +10,60 @@ import othello.ai.minimax.MiniMaxAI;
  */
 public class ExampleCombinedAI implements AI{
 
+    private final PossibleMoveEvaluator possibleMoveEvaluator;
     MiniMaxAI miniMax;
     Game game;
-    UnflippablePieceSingularEvaluator unflippablePieceSingularEvaluator;
+    Board board;
+
+    int move = 0;
+    private final UnflippablePieceAreaEvaluator unflippablePieceAreaEvaluator;
+    private final UnflippablePieceSingularEvaluator unflippablePieceSingularEvaluator;
+    private final PieceCountEvaluator pieceCountEvaluator;
+    private final FixedFieldScoreEvaluator fixedFieldScoreEvaluator;
+    private final WallCountEvaluator wallCountEvaluator;
     public ExampleCombinedAI(Game game) {
         this.game = game;
-        miniMax = new MiniMaxAI(game, 1);
-        unflippablePieceSingularEvaluator = new UnflippablePieceSingularEvaluator(game.getBoard());
+        board = game.getBoard();
+        miniMax = new MiniMaxAI(game, 3);
+        unflippablePieceAreaEvaluator = new UnflippablePieceAreaEvaluator(board);
+        unflippablePieceSingularEvaluator = new UnflippablePieceSingularEvaluator(board);
+        pieceCountEvaluator = new PieceCountEvaluator();
+        fixedFieldScoreEvaluator = new FixedFieldScoreEvaluator();
+        possibleMoveEvaluator = new PossibleMoveEvaluator();
+        wallCountEvaluator = new WallCountEvaluator();
 //        miniMax.addEvaluator(new FixedFieldScoreEvaluator(), 1);
-        miniMax.addEvaluator(new PossibleMoveEvaluator(), 1);
-        miniMax.addEvaluator(new UnflippablePieceSingularEvaluator(game.getBoard()), 2);
+
     }
+
+    private boolean firstFase;
+    private boolean secondFase;
+    private boolean thirdFase;
+    private boolean fourthFase;
 
     @Override
     public String getMove() {
-        return miniMax.setMaxDepth(1).getMove();
+        int emptySpaces = board.getEmptySpaces();
+        if(emptySpaces > 50) {
+            if(!firstFase) {
+                firstFase = true;
+                miniMax.addEvaluator(possibleMoveEvaluator, 1);
+                miniMax.addEvaluator(pieceCountEvaluator, 3);
+                miniMax.addEvaluator(fixedFieldScoreEvaluator, 1);
+               miniMax.addEvaluator(wallCountEvaluator, 1);
+            }
+        } else if(emptySpaces <= 50 && emptySpaces > 8) {
+            if(!thirdFase) {
+                thirdFase = true;
+                miniMax.addEvaluator(unflippablePieceAreaEvaluator, 50);
+                miniMax.addEvaluator(unflippablePieceSingularEvaluator, 50);
+            }
+        } else if(!fourthFase){
+            fourthFase = true;
+            miniMax.removeEvaluator(unflippablePieceAreaEvaluator)
+                    .removeEvaluator(unflippablePieceSingularEvaluator)
+                    .removeEvaluator(possibleMoveEvaluator)
+                    .setMaxDepth(8);
+        }
+        return miniMax.getMove();
     }
 }

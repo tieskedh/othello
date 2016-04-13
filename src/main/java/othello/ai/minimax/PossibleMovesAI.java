@@ -1,8 +1,11 @@
 package othello.ai.minimax;
 
+import othello.Board;
 import othello.Game;
 import othello.ai.evaluators.PossibleMoveEvaluator;
 import othello.ai.minimax.MiniMaxAI;
+
+import java.awt.*;
 
 /**
  * Created by thijs on 10-4-2016.

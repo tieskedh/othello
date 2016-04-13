@@ -2,7 +2,6 @@ package othello;
 
 import othello.ai.AI;
 import othello.ai.ExampleCombinedAI;
-import othello.ai.minimax.CustomCombinedAI;
 import othello.gui.GameView;
 import nl.abstractteam.gamemodule.ClientAbstractGameModule;
 import nl.abstractteam.gamemodule.MoveListener;
