@@ -25,11 +25,11 @@ public class Board {
      */
     public static final int PLAYER_1 = 1;
     /**
-     * represents a space with the piece of the enemy
+     * represents a space with the piece of the opposing player
      */
     public static final int PLAYER_2 = 2;
     /**
-     * represents the size of a side of the board
+     * The size of a side of the board
      */
     protected final int BOARD_SIZE;
     public int board[][];
@@ -109,7 +109,6 @@ public class Board {
     public int getAtLocation(Point location) {
         return board[location.x][location.y];
     }
-
 
     /**
      * Flips the side of a piece.
@@ -303,7 +302,7 @@ public class Board {
     }
 
     public int getEmptySpaces(){
-    	int spaces = 0;
+        int spaces = 0;
 
         for (int[] row : board) {
             for (int field : row) {
@@ -311,7 +310,7 @@ public class Board {
                     spaces++;
             }
         }
-    	return spaces;
+        return spaces;
     }
 
     public void removeActionListener(ActionListener listener) {

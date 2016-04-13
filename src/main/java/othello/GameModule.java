@@ -10,7 +10,8 @@ import javax.swing.ImageIcon;
 import nl.abstractteam.gamemodule.ClientAbstractGameModule;
 import nl.abstractteam.gamemodule.MoveListener;
 import othello.ai.AI;
-import othello.ai.minimax.StandardCombinedAI;
+
+import othello.ai.StandardCombinedAI;
 import othello.gui.GameView;
 
 public class GameModule extends ClientAbstractGameModule implements ActionListener {
