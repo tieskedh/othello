@@ -19,4 +19,6 @@ public interface Evaluator {
      * @return The score of the move
      */
     public int getScore(Board board, int side, Point move);
+
+
 }

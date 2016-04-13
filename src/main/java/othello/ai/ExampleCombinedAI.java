@@ -2,8 +2,9 @@ package othello.ai;
 
 import othello.Board;
 import othello.Game;
+import othello.ai.algorithms.Algorithm;
 import othello.ai.evaluators.*;
-import othello.ai.minimax.MiniMaxAI;
+import othello.ai.algorithms.MiniMaxAI;
 
 /**
  * Created by thijs on 11-4-2016.
@@ -11,7 +12,7 @@ import othello.ai.minimax.MiniMaxAI;
 public class ExampleCombinedAI implements AI{
 
     private final PossibleMoveEvaluator possibleMoveEvaluator;
-    MiniMaxAI miniMax;
+    Algorithm miniMax;
     Game game;
     Board board;
 

@@ -1,4 +1,4 @@
-package othello.ai.minimax;
+package othello.ai.algorithms;
 
 import othello.Board;
 import othello.Game;
@@ -8,44 +8,45 @@ import othello.ai.evaluators.MiniMaxEvaluator;
 import othello.utility.WeightedMove;
 
 import java.awt.*;
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 /**
- * Created by thijs on 11-4-2016.
+ * Created by thijs on 13-4-2016.
  */
-public class MiniMaxAI implements AI, Evaluator {
+public abstract class Algorithm implements AI, Evaluator {
     protected Game game;
     protected Board board;
     protected int currentPlayer;
-    protected int maxDepth;
+    protected int maxDepth;LinkedHashMap<Evaluator, Integer> evaluators = new LinkedHashMap<>();
 
-    LinkedHashMap<Evaluator, Integer> evaluators = new LinkedHashMap<>();
-
-
-    public MiniMaxAI(Game game, int depth) {
-        this.game = game;
-        this.maxDepth = depth;
+    public Algorithm(int depth, Game game) {
         board = game.getBoard();
+        this.maxDepth = depth;
+        this.game = game;
     }
 
-    public MiniMaxAI setMaxDepth(int maxDepth) {
+    public Algorithm setMaxDepth(int maxDepth) {
         this.maxDepth = maxDepth;
         return this;
     }
 
-    public MiniMaxAI addEvaluator(Evaluator evaluator, int score) {
+    public Algorithm addEvaluator(Evaluator evaluator, int score) {
         evaluators.put(evaluator, score);
         return this;
     }
 
-    public MiniMaxAI removeEvaluator(Evaluator evaluator) {
+    public Algorithm removeEvaluator(Evaluator evaluator) {
         evaluators.remove(evaluator);
         return this;
     }
 
-    public void setScore(Evaluator evaluator, int score) {
+    public Algorithm setScore(Evaluator evaluator, int score) {
         evaluators.replace(evaluator, score);
+        return this;
     }
 
     public final String getMove() {
@@ -55,53 +56,28 @@ public class MiniMaxAI implements AI, Evaluator {
         return "" + move.location;
     }
 
-    private Stream<Point> getPossibleMoveStream(int side) {
+    protected Stream<Point> getPossibleMoveStream(int side) {
         return Arrays.stream(board.getPossibleMoves(side));
     }
 
-    private Stream<Point> getStartingStream(int side) {
+    protected Stream<Point> getStartingStream(int side) {
         return getPossibleMoveStream(side).parallel();
     }
 
-    private Stream<Point> getLoopingStream(int side) {
+    protected Stream<Point> getLoopingStream(int side) {
         return getPossibleMoveStream(side);
     }
 
-    private WeightedMove progressStream(Stream<Point> pointStream, Board board, int side, int depth) {
+    protected WeightedMove progressStream(Stream<Point> pointStream, Board board, int side, int depth) {
         return pointStream.map(move -> evaluate(board, side, depth, move))
                 .filter(Objects::nonNull)
                 .max((move1, move2)->move1.getScore()-move2.getScore())
                 .orElse(null);
     }
 
-    private WeightedMove evaluate(Board board, int side, int depth, Point move) {
-        //new board
-        Board tempBoard = new Board(board);
-        tempBoard.doMove(move.getLocation(), side);
+    public abstract WeightedMove evaluate(Board board,int side, int depth, Point move);
 
-        //if depth < maxDepth
-        if(depth < maxDepth) {
-
-            //for each possible move, get the maximum evaluation
-            int opponent = getNextPLayer(board, side);
-            if(opponent==0) {
-                return new WeightedMove(side, move)
-                        .setScore(getScore(board, side, move, depth));
-            } else {
-                WeightedMove tempMove = progressStream(getLoopingStream(opponent), tempBoard, opponent, depth+1);
-                int score = (tempMove==null)? 0 : tempMove.getScore();
-                score += getScore(board, side,move, depth);
-                return new WeightedMove(side, move).setScore(score);
-            }
-        }
-        if(side==game.getClient()) {
-            return new WeightedMove(side, move).setScore(getScore(tempBoard, side, move, depth));
-        } else {
-            return new WeightedMove(side, move).setScore(-1*getScore(tempBoard, side, move, depth));
-        }
-    }
-
-    private int getNextPLayer(Board board, int currentPlayer) {
+    protected int getNextPLayer(Board board, int currentPlayer) {
         if(board.getPossibleMoves(3-currentPlayer).length==0) {
             if(board.getPossibleMoves(currentPlayer).length == 0) {
                 return 0;
