@@ -19,8 +19,8 @@ public class GreedyAI extends MiniMaxAI {
     }
 
     @Override
-    public int getScore(Board board, int side, Point move) {
+    public int getScore(Board board, int side, Point move, int depth) {
         System.out.println(side);
-        return super.getScore(board, side, move);
+        return super.getScore(board, side, move, depth);
     }
 }

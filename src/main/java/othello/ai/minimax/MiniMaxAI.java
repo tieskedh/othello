@@ -4,6 +4,7 @@ import othello.Board;
 import othello.Game;
 import othello.ai.AI;
 import othello.ai.evaluators.Evaluator;
+import othello.ai.evaluators.MiniMaxEvaluator;
 import othello.utility.WeightedMove;
 
 import java.awt.*;
@@ -52,7 +53,6 @@ public class MiniMaxAI implements AI {
         return "" + move.location;
     }
 
-
     private Stream<Point> getPossibleMoveStream(int side) {
         return Arrays.stream(board.getPossibleMoves(side));
     }
@@ -84,15 +84,15 @@ public class MiniMaxAI implements AI {
             int opponent = getNextPLayer(board, side);
             if(opponent==0) {
                 return new WeightedMove(side, move)
-                        .setScore(getScore(board, side, move));
+                        .setScore(getScore(board, side, move, depth));
             } else {
                 WeightedMove tempMove = progressStream(getLoopingStream(opponent), tempBoard, opponent, depth+1);
                 int score = (tempMove==null)? 0 : tempMove.getScore();
-                score += getScore(board, side,move);
+                score += getScore(board, side,move, depth);
                 return new WeightedMove(side, move).setScore(score);
             }
         }
-        return new WeightedMove(side, move).setScore(getScore(tempBoard, side, move));
+        return new WeightedMove(side, move).setScore(getScore(tempBoard, side, move, depth));
     }
 
     private int getNextPLayer(Board board, int currentPlayer) {
@@ -107,10 +107,16 @@ public class MiniMaxAI implements AI {
         }
     }
 
-    public int getScore(Board board, int side, Point move) {
+    public int getScore(Board board, int side, Point move, int depth) {
         int score = 0;
         for (Map.Entry<Evaluator, Integer> entry : evaluators.entrySet()) {
-            score+=entry.getKey().getScore(board, side, move)*entry.getValue();
+            if(entry.getKey() instanceof MiniMaxEvaluator) {
+                if(depth< ((MiniMaxEvaluator) entry.getKey()).maxDepth) {
+                    score+=entry.getKey().getScore(board, side, move)*entry.getValue();
+                }
+            } else {
+                score+=entry.getKey().getScore(board, side, move)*entry.getValue();
+            }
         }
         return score;
     }

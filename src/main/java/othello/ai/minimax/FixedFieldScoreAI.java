@@ -1,6 +1,5 @@
 package othello.ai.minimax;
 
-import othello.Board;
 import othello.Game;
 import othello.ai.evaluators.FixedFieldScoreEvaluator;
 import othello.ai.evaluators.PieceCountEvaluator;
@@ -11,7 +10,7 @@ import othello.ai.evaluators.PieceCountEvaluator;
 public class FixedFieldScoreAI extends MiniMaxAI {
     public FixedFieldScoreAI(Game game) {
         super(game, 3);
-        addEvaluator(new FixedFieldScoreEvaluator(game), 1);
+        addEvaluator(new FixedFieldScoreEvaluator(), 1);
         addEvaluator(new PieceCountEvaluator(), 1);
     }
 }

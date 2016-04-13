@@ -1,22 +1,17 @@
 package othello;
 
-import othello.ai.AI;
-import othello.ai.ExampleCombinedAI;
-import othello.ai.minimax.CustomCombinedAI;
-import othello.ai.minimax.GreedyAI;
-import othello.ai.minimax.ImprovedGreedyAI;
-import othello.ai.minimax.PossibleMovesAI;
-import othello.ai.minimax.RandomAI;
-import othello.gui.GameView;
-import nl.abstractteam.gamemodule.ClientAbstractGameModule;
-import nl.abstractteam.gamemodule.MoveListener;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.LinkedList;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import nl.abstractteam.gamemodule.ClientAbstractGameModule;
+import nl.abstractteam.gamemodule.MoveListener;
+import othello.ai.AI;
+import othello.ai.minimax.CustomCombinedAI;
+import othello.gui.GameView;
 
 public class GameModule extends ClientAbstractGameModule implements ActionListener {
     private static final int BOARD_SIZE = 8;
@@ -83,8 +78,13 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
     @Override
     public void doPlayerMove(String player, String move) throws IllegalStateException {
         game.fireEvents(true);
+        int intMove;
+        try {
+            intMove = Integer.parseInt(move);
+        } catch (Exception e) {
+            throw new IllegalStateException("Move not Integer format.");
+        }
 
-        int intMove = Integer.parseInt(move);
         // string in de vorm van 0-63 / 0-8,0-8 binnen
         if (matchStatus != MATCH_STARTED) {
             throw new IllegalStateException("Illegal match state");
@@ -176,7 +176,7 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
     @Override
     public void setClientBegins(boolean clientBegins) {
         game.setClientBegins(clientBegins);
-        ai = new RandomAI(game);
+        ai = new CustomCombinedAI(game);
     }
 
     //called 2nd
@@ -226,4 +226,6 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
     public void addMoveListener(MoveListener movelistener) {
         moveListeners.add(movelistener);
     }
+
+
 }
