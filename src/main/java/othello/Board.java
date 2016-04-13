@@ -1,7 +1,4 @@
-package othello;
-
-import othello.gui.AbstractModel;
-import othello.utility.Move;
+import com.sun.org.apache.xpath.internal.SourceTree;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -25,11 +22,11 @@ public class Board {
      */
     public static final int PLAYER_1 = 1;
     /**
-     * represents a space with the piece of the opposing player
+     * represents a space with the piece of the enemy
      */
     public static final int PLAYER_2 = 2;
     /**
-     * The size of a side of the board
+     * represents the size of a side of the board
      */
     protected final int BOARD_SIZE;
     public int board[][];
@@ -108,6 +105,17 @@ public class Board {
      */
     public int getAtLocation(Point location) {
         return board[location.x][location.y];
+    }
+
+    /**
+     * Sets the value of the given location
+     *
+     * @param location The location where to set the value from
+     * @param player   the player which needs to be placed at the given location
+     */
+    private void setAtLocation(Point location, int player) {
+        board[location.x][location.y] = player;
+        game.piecePlaced(location, player);
     }
 
     /**

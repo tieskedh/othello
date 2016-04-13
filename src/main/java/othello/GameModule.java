@@ -10,22 +10,23 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 
 public class GameModule extends ClientAbstractGameModule implements ActionListener {
-    private static final int BOARD_SIZE = 8;
-    private GameView gameView;
+	private static final int BOARD_SIZE = 8;
+	private GameView gameView;
 
-    private HashMap<String, Integer> playerResults = new HashMap<>();
-    private String moveDetails;
+	private HashMap<String, Integer> playerResults = new HashMap<>();
+	private String moveDetails;
 
-    private LinkedList<MoveListener> moveListeners = new LinkedList<>();
+	private LinkedList<MoveListener> moveListeners = new LinkedList<>();
 
-    public static final String GAME_TYPE = "Reversi";
-    private static final String BLACK = "Black";
-    private static final String WHITE = "White";
-    public static final String[] GAME_PIECES = new String[]{WHITE, BLACK};
+	public static final String GAME_TYPE = "Reversi";
+	private static final String BLACK = "Black";
+	private static final String WHITE = "White";
+	public static final String[] GAME_PIECES = new String[] { WHITE, BLACK };
 
     public final Game game;
     public AI ai;
@@ -55,10 +56,11 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
         gameView.addActionListener(this);
     }
 
-    @Override
-    public Component getView() {
-        return gameView;
-    }
+	@Override
+	public Component getView() {
+		return gameView;
+	}
+
 
     /**
      * Sends action to all MoveListeners.
@@ -85,14 +87,14 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
             throw new IllegalStateException("Move not Integer format.");
         }
 
-        // string in de vorm van 0-63 / 0-8,0-8 binnen
-        if (matchStatus != MATCH_STARTED) {
-            throw new IllegalStateException("Illegal match state");
-        }
+		// string in de vorm van 0-63 / 0-8,0-8 binnen
+		if (matchStatus != MATCH_STARTED) {
+			throw new IllegalStateException("Illegal match state");
+		}
 
-        if (!game.getCurrentPlayer().equals(player)) {
-            throw new IllegalStateException("IT is not the turn of: " + player);
-        }
+		if (!game.getCurrentPlayer().equals(player)) {
+			throw new IllegalStateException("IT is not the turn of: " + player);
+		}
 
         if (!(intMove >= 0 && intMove <= 63)) {
             throw new IllegalStateException("Move outside boundaries of 0-63");
@@ -136,11 +138,11 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
         return matchStatus;
     }
 
-    @Override
-    public String getMoveDetails() throws IllegalStateException {
-        if (matchStatus == MATCH_INITIALIZED) {
-            throw new IllegalStateException("Illegal match state");
-        }
+	@Override
+	public String getMoveDetails() throws IllegalStateException {
+		if (matchStatus == MATCH_INITIALIZED) {
+			throw new IllegalStateException("Illegal match state");
+		}
 
         if (moveDetails == null) {
             moveDetails = "Everything is silent. No moves have been performed";
@@ -176,7 +178,7 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
     @Override
     public void setClientBegins(boolean clientBegins) {
         game.setClientBegins(clientBegins);
-        ai = new ExampleCombinedAI(game);
+        ai = new CombinedAI(game);
     }
 
     //called 2nd
