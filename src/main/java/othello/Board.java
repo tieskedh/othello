@@ -1,4 +1,7 @@
-import com.sun.org.apache.xpath.internal.SourceTree;
+package othello;
+
+import othello.gui.AbstractModel;
+import othello.utility.Move;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -107,16 +110,6 @@ public class Board {
         return board[location.x][location.y];
     }
 
-    /**
-     * Sets the value of the given location
-     *
-     * @param location The location where to set the value from
-     * @param player   the player which needs to be placed at the given location
-     */
-    private void setAtLocation(Point location, int player) {
-        board[location.x][location.y] = player;
-        game.piecePlaced(location, player);
-    }
 
     /**
      * Flips the side of a piece.
