@@ -37,7 +37,7 @@ public class CustomCombinedAI implements AI{
 		if (move == -1) {
 			return null;
 		}
-		return "" + move;
+		return Integer.toString(move);
 	}
     
     private int getBestGreedyMove(Board board){
@@ -138,7 +138,6 @@ public class CustomCombinedAI implements AI{
 		for (Point possibleMove : possibleMoves){
 			board.doMoveInternal(possibleMove, opponent);
 			if (board.getOccurrences(player) == 0) {
-				System.out.println("I can lose... return -100");
 				return -100;
 			}
 		}
