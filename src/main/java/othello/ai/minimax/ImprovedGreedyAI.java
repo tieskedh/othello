@@ -79,6 +79,21 @@ public class ImprovedGreedyAI implements AI{
     }
 	
 	private int getScore(Board board, Point point, int player, int opponent){
+		int[][] boardPieces = board.getBoardPieces();
+		int[][] oldBoardPieces = new int[8][8];
+		for (int i = 0; i < boardPieces.length; i++) {
+            System.arraycopy(boardPieces[i], 0, oldBoardPieces[i], 0, boardPieces[i].length);
+        }
+		
+		Point[] possibleMoves = board.getPossibleMoves(opponent);
+		for (Point possibleMove : possibleMoves){
+			board.doMoveInternal(possibleMove, opponent);
+			if (board.getOccurrences(player) == 0) {
+				System.out.println("I can lose... return -100");
+				return -100;
+			}
+		}
+		
 		int score = 0;
 		int positionScore = 0;
 		int gameStateScore = 0;

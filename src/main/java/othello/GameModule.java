@@ -176,7 +176,7 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
     @Override
     public void setClientBegins(boolean clientBegins) {
         game.setClientBegins(clientBegins);
-        ai = new ImprovedGreedyAI(game);
+        ai = new CustomCombinedAI(game);
     }
 
     //called 2nd

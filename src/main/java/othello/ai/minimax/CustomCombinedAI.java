@@ -29,8 +29,7 @@ public class CustomCombinedAI implements AI{
 		int move;
 		
 		if (board.getEmptySpaces() <= 9) {
-			System.out.println("ohtello AI -> starting minimax");
-			move = getBestMiniMaxMove(board, 0, game.getClient(), game.getOpponent(), game.getClient())[1];
+			move = getBestMiniMaxMove(board, 0, game.getClient(), game.getClient())[1];
 		} else {
 			move = getBestGreedyMove(board);
 		}
@@ -77,15 +76,27 @@ public class CustomCombinedAI implements AI{
         }
         return move;
     }
+    
+    private int getNextPlayer(Board board, int currentPlayer) {
+    	if (board.getPossibleMoves(3-currentPlayer).length == 0) {
+    		if (board.getPossibleMoves(currentPlayer).length == 0) {
+    			return 0;
+    		} else {
+    			return currentPlayer;
+    		}
+    	} else {
+    		return 3 - currentPlayer;
+    	}
+    }
 
-	private int[] getBestMiniMaxMove(Board board, int depth, int client, int opponent, int turn) {
+	private int[] getBestMiniMaxMove(Board board, int depth, int client, int currentPlayer) {
 		int currentScore;
-		int bestScore = (turn == client) ? Integer.MIN_VALUE : Integer.MAX_VALUE;
+		int bestScore = (currentPlayer == client) ? Integer.MIN_VALUE : Integer.MAX_VALUE;
 		int bestMove = -1;
 		
-		Point[] possibleMoves = board.getPossibleMoves(turn);
+		Point[] possibleMoves = board.getPossibleMoves(currentPlayer);
 		
-		if (depth < 9 && possibleMoves.length > 0) {			
+		if (possibleMoves.length > 0) {			
 			int[][] boardPieces = board.getBoardPieces();
 			int[][] oldBoardPieces = new int[8][8];
 			for (int i = 0; i < boardPieces.length; i++) {
@@ -93,18 +104,16 @@ public class CustomCombinedAI implements AI{
 	        }
 
 			for (Point possibleMove : possibleMoves) {
-				board.doMoveInternal(possibleMove, turn);
-				if (turn == client) {
-					currentScore = getBestMiniMaxMove(board, (depth + 1), client, opponent, switchSide(turn, client, opponent))[0];
-					//currentScore += getBoardPlaceRating(currentMove);
+				board.doMoveInternal(possibleMove, currentPlayer);
+				if (currentPlayer == client) {
+					currentScore = getBestMiniMaxMove(board, (depth + 1), client, getNextPlayer(board, client))[0];
 					if (currentScore > bestScore){
 						bestMove = game.pointToInt(possibleMove);
 						bestScore = currentScore;
 					}
 				} else {
-					currentScore = getBestMiniMaxMove(board, (depth + 1), client, opponent, switchSide(turn, client, opponent))[0];
-					//currentScore += getBoardPlaceRating(currentMove);
-					if (currentScore > bestScore){
+					currentScore = getBestMiniMaxMove(board, (depth + 1), client, getNextPlayer(board, client))[0];
+					if (currentScore < bestScore){
 						bestMove = game.pointToInt(possibleMove);
 						bestScore = currentScore;
 					}
@@ -113,14 +122,27 @@ public class CustomCombinedAI implements AI{
 				board.setBoardPieces(oldBoardPieces);
 			}
 		} else {
-			if(depth % 2 > 0)
-				return new int[] {board.getOccurrences(opponent), bestMove};
 			return new int[] {board.getOccurrences(client), bestMove};
 		}
 		return new int[] {bestScore, bestMove};
 	}
 	
 	private int getScore(Board board, Point point, int player, int opponent){
+		int[][] boardPieces = board.getBoardPieces();
+		int[][] oldBoardPieces = new int[8][8];
+		for (int i = 0; i < boardPieces.length; i++) {
+            System.arraycopy(boardPieces[i], 0, oldBoardPieces[i], 0, boardPieces[i].length);
+        }
+		
+		Point[] possibleMoves = board.getPossibleMoves(opponent);
+		for (Point possibleMove : possibleMoves){
+			board.doMoveInternal(possibleMove, opponent);
+			if (board.getOccurrences(player) == 0) {
+				System.out.println("I can lose... return -100");
+				return -100;
+			}
+		}
+		
 		int score = 0;
 		int positionScore = 0;
 		int gameStateScore = 0;
