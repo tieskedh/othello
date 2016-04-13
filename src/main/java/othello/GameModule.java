@@ -4,6 +4,7 @@ import othello.ai.AI;
 import othello.ai.ExampleCombinedAI;
 import othello.ai.minimax.CustomCombinedAI;
 import othello.ai.minimax.GreedyAI;
+import othello.ai.minimax.ImprovedGreedyAI;
 import othello.ai.minimax.PossibleMovesAI;
 import othello.ai.minimax.RandomAI;
 import othello.gui.GameView;
@@ -175,7 +176,7 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
     @Override
     public void setClientBegins(boolean clientBegins) {
         game.setClientBegins(clientBegins);
-        ai = new CustomCombinedAI(game);
+        ai = new ImprovedGreedyAI(game);
     }
 
     //called 2nd
