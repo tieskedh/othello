@@ -1,4 +1,4 @@
-package othello.ai.minimax;
+package othello.ai;
 import java.awt.Point;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -6,7 +6,6 @@ import java.util.Random;
 
 import othello.Board;
 import othello.Game;
-import othello.ai.AI;
 
 public class ImprovedGreedyAI implements AI{
 	private Game game;
