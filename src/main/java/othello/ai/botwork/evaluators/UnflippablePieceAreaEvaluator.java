@@ -1,4 +1,4 @@
-package othello.ai.evaluators;
+package othello.ai.botwork.evaluators;
 
 import othello.Board;
 import othello.utility.Move;
@@ -9,19 +9,16 @@ import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.stream.IntStream;
 
-import static othello.utility.Move.BOARD_SIZE;
-
 /**
  * Created by Gebruiker on 12/04/2016.
  */
-public class UnflippablePieceAreaEvaluator extends MiniMaxEvaluator implements Evaluator, ActionListener {
+public class UnflippablePieceAreaEvaluator implements ActionListener, MaxDepthEvaluator {
     private static final int PLAYER_ONE = 1;
     private static final int PLAYER_TWO = 2;
     private boolean[][] stablePieceArrayPlayerOne = new boolean[10][10];
     private boolean[][] stablePieceArrayPlayerTwo = new boolean[10][10];
 
     public UnflippablePieceAreaEvaluator(Board board) {
-        super(1);
         board.addActionListener(this);
 
         for(int i= 0; i  < 10; i++) {
@@ -131,5 +128,10 @@ public class UnflippablePieceAreaEvaluator extends MiniMaxEvaluator implements E
         int opponentScore = determineIfStable(move, side-1)?1:0;
         System.out.println(score+"for player "+side+" with move "+move);
         return score-opponentScore*4;
+    }
+
+    @Override
+    public int getMaxDepth() {
+        return 1;
     }
 }

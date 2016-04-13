@@ -1,10 +1,10 @@
-package othello.ai.algorithms;
+package othello.ai.botwork.algorithms;
 
 import othello.Board;
 import othello.Game;
 import othello.ai.AI;
-import othello.ai.evaluators.Evaluator;
-import othello.ai.evaluators.MiniMaxEvaluator;
+import othello.ai.botwork.evaluators.Evaluator;
+import othello.ai.botwork.evaluators.MaxDepthEvaluator;
 import othello.utility.WeightedMove;
 
 import java.awt.*;
@@ -92,8 +92,8 @@ public abstract class Algorithm implements AI, Evaluator {
     public int getScore(Board board, int side, Point move, int depth) {
         int score = 0;
         for (Map.Entry<Evaluator, Integer> entry : evaluators.entrySet()) {
-            if(entry.getKey() instanceof MiniMaxEvaluator) {
-                if(depth <= ((MiniMaxEvaluator) entry.getKey()).maxDepth) {
+            if(entry.getKey() instanceof MaxDepthEvaluator) {
+                if(depth <= ((MaxDepthEvaluator) entry.getKey()).getMaxDepth()) {
                     score+=entry.getKey().getScore(board, side, move)*entry.getValue();
                 }
             } else {

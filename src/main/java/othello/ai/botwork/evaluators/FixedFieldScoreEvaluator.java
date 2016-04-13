@@ -1,4 +1,4 @@
-package othello.ai.evaluators;
+package othello.ai.botwork.evaluators;
 
 import othello.Board;
 

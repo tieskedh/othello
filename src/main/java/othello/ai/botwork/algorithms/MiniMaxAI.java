@@ -1,15 +1,10 @@
-package othello.ai.algorithms;
+package othello.ai.botwork.algorithms;
 
 import othello.Board;
 import othello.Game;
-import othello.ai.AI;
-import othello.ai.evaluators.Evaluator;
-import othello.ai.evaluators.MiniMaxEvaluator;
 import othello.utility.WeightedMove;
 
 import java.awt.*;
-import java.util.*;
-import java.util.stream.Stream;
 
 /**
  * Created by thijs on 11-4-2016.

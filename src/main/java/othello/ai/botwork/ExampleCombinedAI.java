@@ -1,15 +1,14 @@
-package othello.ai;
+package othello.ai.botwork;
 
 import othello.Board;
 import othello.Game;
-import othello.ai.algorithms.Algorithm;
-import othello.ai.evaluators.*;
-import othello.ai.algorithms.MiniMaxAI;
-
+import othello.ai.AI;
+import othello.ai.botwork.evaluators.*;
+import othello.ai.botwork.algorithms.*;
 /**
  * Created by thijs on 11-4-2016.
  */
-public class ExampleCombinedAI implements AI{
+public class ExampleCombinedAI implements AI {
 
     private final PossibleMoveEvaluator possibleMoveEvaluator;
     Algorithm miniMax;
