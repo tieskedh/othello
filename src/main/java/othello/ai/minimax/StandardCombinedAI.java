@@ -6,7 +6,7 @@ import othello.Board;
 import othello.Game;
 import othello.ai.AI;
 
-public class CustomCombinedAI implements AI{
+public class StandardCombinedAI implements AI{
     private static final int[] RATINGTHIRTY = 			{0, 7, 56, 63};
     private static final int[] RATING_TEN = 			{2, 5, 16, 23, 40, 47, 58, 61};
     private static final int[] RATING_FIVE = 			{3, 4, 18, 21, 24, 31, 32, 39, 42, 45, 59, 60}; 
@@ -19,7 +19,7 @@ public class CustomCombinedAI implements AI{
     
     private Game game;
     
-    public CustomCombinedAI(Game game){
+    public StandardCombinedAI(Game game){
     	this.game = game;
     }
     
@@ -156,17 +156,17 @@ public class CustomCombinedAI implements AI{
 			gameStateScore = MID_GAME_RATIO * (board.getOccurrences(player) - board.getOccurrences(opponent));
 		}
 		
-		if (placeOnBoardEquals(CustomCombinedAI.RATING_ONE, place))
+		if (placeOnBoardEquals(StandardCombinedAI.RATING_ONE, place))
 			positionScore = 1;
-		else if (placeOnBoardEquals(CustomCombinedAI.RATING_FIVE, place))
+		else if (placeOnBoardEquals(StandardCombinedAI.RATING_FIVE, place))
 			positionScore = 5;
-		else if (placeOnBoardEquals(CustomCombinedAI.RATING_MINUS_TWENTYFIVE, place))
+		else if (placeOnBoardEquals(StandardCombinedAI.RATING_MINUS_TWENTYFIVE, place))
 			positionScore = -25;
-		else if (placeOnBoardEquals(CustomCombinedAI.RATING_TWO, place))
+		else if (placeOnBoardEquals(StandardCombinedAI.RATING_TWO, place))
 			positionScore = 2;
-		else if (placeOnBoardEquals(CustomCombinedAI.RATING_TEN, place))
+		else if (placeOnBoardEquals(StandardCombinedAI.RATING_TEN, place))
 			positionScore = 10;
-		else if (placeOnBoardEquals(CustomCombinedAI.RATINGTHIRTY, place))
+		else if (placeOnBoardEquals(StandardCombinedAI.RATINGTHIRTY, place))
 			positionScore = 30;
 		
 		positionScore = POSITION_GAME_RATIO * positionScore;
