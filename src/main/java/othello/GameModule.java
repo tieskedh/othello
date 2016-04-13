@@ -10,7 +10,7 @@ import javax.swing.ImageIcon;
 import nl.abstractteam.gamemodule.ClientAbstractGameModule;
 import nl.abstractteam.gamemodule.MoveListener;
 import othello.ai.AI;
-import othello.ai.CustomCombinedAI;
+import othello.ai.minimax.StandardCombinedAI;
 import othello.gui.GameView;
 
 public class GameModule extends ClientAbstractGameModule implements ActionListener {
@@ -176,7 +176,7 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
     @Override
     public void setClientBegins(boolean clientBegins) {
         game.setClientBegins(clientBegins);
-        ai = new CombinedAI(game);
+        ai = new StandardCombinedAI(game);
     }
 
     //called 2nd
