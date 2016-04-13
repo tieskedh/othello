@@ -1,12 +1,18 @@
 package othello.ai.minimax;
 import java.awt.Point;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Random;
 
 import othello.Board;
 import othello.Game;
 import othello.ai.AI;
 
-public class CustomCombinedAI implements AI{
+public class ImprovedGreedyAI implements AI{
+	private Game game;
+	private boolean timeLeft = true;
+	private int runningTime = 0;
+	private Random random = new Random();
     private static final int[] RATINGTHIRTY = 			{0, 7, 56, 63};
     private static final int[] RATING_TEN = 			{2, 5, 16, 23, 40, 47, 58, 61};
     private static final int[] RATING_FIVE = 			{3, 4, 18, 21, 24, 31, 32, 39, 42, 45, 59, 60}; 
@@ -16,31 +22,26 @@ public class CustomCombinedAI implements AI{
     private static final int EARLY_GAME_RATIO = 150;
     private static final int MID_GAME_RATIO = 125;
     private static final int POSITION_GAME_RATIO = 140;
-    
-    private Game game;
-    
-    public CustomCombinedAI(Game game){
-    	this.game = game;
-    }
-    
+	
+	public ImprovedGreedyAI(Game game) {
+		this.game = game;
+	}
+
 	@Override
 	public String getMove() {
+		timeLeft = true;
+		
 		Board board = game.getBoard();
-		int move;
+		int move = -1;
 		
-		if (board.getEmptySpaces() <= 9) {
-			move = getBestMiniMaxMove(board, 0, game.getClient(), game.getClient())[1];
-		} else {
-			move = getBestGreedyMove(board);
-		}
+		move = getBestGreedyMove(board);
 		
-		if (move == -1) {
+		if(move == -1)
 			return null;
-		}
-		return Integer.toString(move);
+		return "" + move;
 	}
-    
-    private int getBestGreedyMove(Board board){
+	
+	private int getBestGreedyMove(Board board){
         int[][] boardPieces = Arrays.copyOf(board.getBoardPieces(), board.getBoardPieces().length);
 
         int[][] newBoardPieces = new int[8][8];
@@ -76,56 +77,6 @@ public class CustomCombinedAI implements AI{
         }
         return move;
     }
-    
-    private int getNextPlayer(Board board, int currentPlayer) {
-    	if (board.getPossibleMoves(3-currentPlayer).length == 0) {
-    		if (board.getPossibleMoves(currentPlayer).length == 0) {
-    			return 0;
-    		} else {
-    			return currentPlayer;
-    		}
-    	} else {
-    		return 3 - currentPlayer;
-    	}
-    }
-
-	private int[] getBestMiniMaxMove(Board board, int depth, int client, int currentPlayer) {
-		int currentScore;
-		int bestScore = (currentPlayer == client) ? Integer.MIN_VALUE : Integer.MAX_VALUE;
-		int bestMove = -1;
-		
-		Point[] possibleMoves = board.getPossibleMoves(currentPlayer);
-		
-		if (possibleMoves.length > 0) {			
-			int[][] boardPieces = board.getBoardPieces();
-			int[][] oldBoardPieces = new int[8][8];
-			for (int i = 0; i < boardPieces.length; i++) {
-	            System.arraycopy(boardPieces[i], 0, oldBoardPieces[i], 0, boardPieces[i].length);
-	        }
-
-			for (Point possibleMove : possibleMoves) {
-				board.doMoveInternal(possibleMove, currentPlayer);
-				if (currentPlayer == client) {
-					currentScore = getBestMiniMaxMove(board, (depth + 1), client, getNextPlayer(board, client))[0];
-					if (currentScore > bestScore){
-						bestMove = game.pointToInt(possibleMove);
-						bestScore = currentScore;
-					}
-				} else {
-					currentScore = getBestMiniMaxMove(board, (depth + 1), client, getNextPlayer(board, client))[0];
-					if (currentScore < bestScore){
-						bestMove = game.pointToInt(possibleMove);
-						bestScore = currentScore;
-					}
-				}
-
-				board.setBoardPieces(oldBoardPieces);
-			}
-		} else {
-			return new int[] {board.getOccurrences(client), bestMove};
-		}
-		return new int[] {bestScore, bestMove};
-	}
 	
 	private int getScore(Board board, Point point, int player, int opponent){
 		int[][] boardPieces = board.getBoardPieces();
@@ -138,6 +89,7 @@ public class CustomCombinedAI implements AI{
 		for (Point possibleMove : possibleMoves){
 			board.doMoveInternal(possibleMove, opponent);
 			if (board.getOccurrences(player) == 0) {
+				System.out.println("I can lose... return -100");
 				return -100;
 			}
 		}
@@ -156,30 +108,23 @@ public class CustomCombinedAI implements AI{
 			gameStateScore = MID_GAME_RATIO * (board.getOccurrences(player) - board.getOccurrences(opponent));
 		}
 		
-		if (placeOnBoardEquals(CustomCombinedAI.RATING_ONE, place))
+		if (placeOnBoardEquals(RATING_ONE, place))
 			positionScore = 1;
-		else if (placeOnBoardEquals(CustomCombinedAI.RATING_FIVE, place))
+		else if (placeOnBoardEquals(RATING_FIVE, place))
 			positionScore = 5;
-		else if (placeOnBoardEquals(CustomCombinedAI.RATING_MINUS_TWENTYFIVE, place))
+		else if (placeOnBoardEquals(RATING_MINUS_TWENTYFIVE, place))
 			positionScore = -25;
-		else if (placeOnBoardEquals(CustomCombinedAI.RATING_TWO, place))
+		else if (placeOnBoardEquals(RATING_TWO, place))
 			positionScore = 2;
-		else if (placeOnBoardEquals(CustomCombinedAI.RATING_TEN, place))
+		else if (placeOnBoardEquals(RATING_TEN, place))
 			positionScore = 10;
-		else if (placeOnBoardEquals(CustomCombinedAI.RATINGTHIRTY, place))
+		else if (placeOnBoardEquals(RATINGTHIRTY, place))
 			positionScore = 30;
 		
 		positionScore = POSITION_GAME_RATIO * positionScore;
 		score = positionScore + gameStateScore;
 		
 		return score;
-	}
-	
-	private int switchSide(int turn, int client, int opponent){
-		if(turn != client){
-			return client;
-		}
-		return opponent;
 	}
 	
 	private boolean placeOnBoardEquals(int[] places, int place) {
@@ -189,5 +134,4 @@ public class CustomCombinedAI implements AI{
 		}
 		return false;
 	}
-
 }

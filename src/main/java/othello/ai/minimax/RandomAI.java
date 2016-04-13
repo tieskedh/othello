@@ -13,6 +13,15 @@ public class RandomAI implements AI{
 	private boolean timeLeft = true;
 	private int runningTime = 0;
 	private Random random = new Random();
+    private static final int[] RATINGTHIRTY = 			{0, 7, 56, 63};
+    private static final int[] RATING_TEN = 			{2, 5, 16, 23, 40, 47, 58, 61};
+    private static final int[] RATING_FIVE = 			{3, 4, 18, 21, 24, 31, 32, 39, 42, 45, 59, 60}; 
+    private static final int[] RATING_TWO = 			{19, 20, 26, 29, 34, 37, 43, 44};
+    private static final int[] RATING_ONE = 			{10, 11, 12, 13, 17, 22, 25, 27, 28, 30, 33, 35, 36, 38, 41, 46, 50, 51, 52, 53};
+    private static final int[] RATING_MINUS_TWENTYFIVE = {1, 6, 8, 9, 14, 15, 48, 49, 54, 55, 57, 62};
+    private static final int EARLY_GAME_RATIO = 150;
+    private static final int MID_GAME_RATIO = 125;
+    private static final int POSITION_GAME_RATIO = 140;
 	
 	public RandomAI(Game game) {
 		this.game = game;
@@ -23,9 +32,10 @@ public class RandomAI implements AI{
 		timeLeft = true;
 		
 		Board board = game.getBoard();
-		
+		int move = -1;
+
 		timer(3500);
-		int move = startFindingBestRandomMove(board);
+		move = startFindingBestRandomMove(board);
 		
 		if(move == -1)
 			return null;
@@ -125,5 +135,4 @@ public class RandomAI implements AI{
         };
         new Thread(thread).start();
 	}
-
 }

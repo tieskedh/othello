@@ -1,18 +1,17 @@
 package othello;
 
-import othello.ai.AI;
-import othello.ai.ExampleCombinedAI;
-import othello.ai.minimax.CustomCombinedAI;
-import othello.gui.GameView;
-import nl.abstractteam.gamemodule.ClientAbstractGameModule;
-import nl.abstractteam.gamemodule.MoveListener;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.LinkedList;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import nl.abstractteam.gamemodule.ClientAbstractGameModule;
+import nl.abstractteam.gamemodule.MoveListener;
+import othello.ai.AI;
+import othello.ai.minimax.CustomCombinedAI;
+import othello.gui.GameView;
 
 public class GameModule extends ClientAbstractGameModule implements ActionListener {
     private static final int BOARD_SIZE = 8;
@@ -177,7 +176,7 @@ public class GameModule extends ClientAbstractGameModule implements ActionListen
     @Override
     public void setClientBegins(boolean clientBegins) {
         game.setClientBegins(clientBegins);
-        ai = new ExampleCombinedAI(game);
+        ai = new CustomCombinedAI(game);
     }
 
     //called 2nd
